@@ -60,17 +60,20 @@ body{font-family:'Inter',sans-serif;background:#18181B;color:#E4E4E7;overflow:hi
 
 /* Table */
 .table-container{flex:1;overflow-y:auto;padding:8px 16px}
-.table-header{display:grid;grid-template-columns:2fr 2fr auto auto auto auto;gap:8px;padding:8px 8px 6px;font-size:11px;font-weight:600;color:#71717A;border-bottom:1px solid #27272A;position:sticky;top:0;background:#18181B;z-index:1}
-.table-row{display:grid;grid-template-columns:2fr 2fr auto auto auto auto;gap:8px;padding:8px;align-items:center;border-radius:6px;transition:background .15s}
+.table-header{display:grid;grid-template-columns:2fr 2fr auto auto auto;gap:8px;padding:8px 8px 6px;font-size:11px;font-weight:600;color:#71717A;border-bottom:1px solid #27272A;position:sticky;top:0;background:#18181B;z-index:1}
+.table-row{display:grid;grid-template-columns:2fr 2fr auto auto auto;gap:8px;padding:8px;align-items:center;border-radius:6px;transition:background .15s}
 .table-row:nth-child(even){background:#1E1E21}
 .table-row:hover{background:#27272A}
+.table-row .app-cell{display:flex;align-items:center;gap:8px}
+.table-row .app-icon{width:24px;height:24px;border-radius:4px;flex-shrink:0}
 .table-row .app-name{font-size:12px;font-weight:500;color:#E4E4E7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .table-row select{background:#27272A;border:1px solid #3F3F46;color:#E4E4E7;padding:4px 8px;border-radius:6px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;outline:none;max-width:100%}
 .table-row select:focus{border-color:#8B5CF6}
 .table-row .launch-btn{background:#8B5CF6;border:none;color:#fff;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;font-family:'Inter',sans-serif;white-space:nowrap}
 .table-row .launch-btn:hover{background:#7C3AED}
-.table-row .traffic-down{font-size:11px;color:#4ADE80;white-space:nowrap}
-.table-row .traffic-up{font-size:11px;color:#FB923C;white-space:nowrap}
+.table-row .traffic-cell{display:flex;flex-direction:column;gap:1px}
+.table-row .traffic-down{font-size:11px;color:#4ADE80;line-height:1.4}
+.table-row .traffic-up{font-size:11px;color:#FB923C;line-height:1.4}
 .table-row .remove-btn{background:none;border:none;color:#EF4444;cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;transition:color .15s,background .15s;font-family:'Inter',sans-serif}
 .table-row .remove-btn:hover{background:rgba(239,68,68,.15)}
 .table-empty{padding:20px;text-align:center;color:#52525B;font-size:13px}
@@ -131,8 +134,7 @@ body{font-family:'Inter',sans-serif;background:#18181B;color:#E4E4E7;overflow:hi
         <span>Application</span>
         <span>Assigned Network</span>
         <span>Action</span>
-        <span>↓ Download</span>
-        <span>↑ Upload</span>
+        <span>Traffic</span>
         <span></span>
       </div>
       <div id="appsContainer"></div>
@@ -183,6 +185,8 @@ function loadAdapters() {
     adapters = data;
     renderAdapters();
     renderApps();
+  }).catch(function(err) {
+    console.error('[loadAdapters] ERROR:', err);
   });
 }
 
@@ -193,7 +197,14 @@ function loadApps() {
   ]).then(function(results) {
     apps = results[0];
     nicknameMap = results[1].nicknames || {};
+    console.log('[loadApps] apps count:', apps.length);
+    if (apps.length > 0) {
+      console.log('[loadApps] first app icon length:', (apps[0].icon || '').length);
+      console.log('[loadApps] first app icon starts with:', (apps[0].icon || '').substring(0, 40));
+    }
     renderApps();
+  }).catch(function(err) {
+    console.error('[loadApps] ERROR:', err);
   });
 }
 
@@ -231,8 +242,15 @@ function renderApps() {
   }
   var html = '';
   for (var i = 0; i < apps.length; i++) {
-    var appPath = apps[i];
-    var appName = appPath.split('\\').pop().split('/').pop();
+    var app = apps[i];
+    var appPath = app.path || app;
+    var appName = app.name || appPath.split('\\').pop().split('/').pop();
+    var appIcon = app.icon || null;
+    if (appIcon) {
+      console.log('[renderApps] app', i, 'icon length:', appIcon.length, 'prefix:', appIcon.substring(0, 40));
+    } else {
+      console.log('[renderApps] app', i, 'icon is NULL');
+    }
     var adapterNames = Object.keys(adapters);
     var selectHtml = '<select onchange="onAssignChange(' + i + ', this.value)" data-index="' + i + '">';
     selectHtml += '<option value="Unassigned">Unassigned</option>';
@@ -245,11 +263,13 @@ function renderApps() {
     selectHtml += '</select>';
 
     html += '<div class="table-row" data-path="' + appPath.replace(/"/g,'&quot;') + '">';
+    html += '<div class="app-cell">';
+    html += '<img class="app-icon" src="' + (appIcon || '').replace(/"/g,'&quot;') + '" width="24" height="24" alt="">';
     html += '<span class="app-name" title="' + appPath.replace(/"/g,'&quot;') + '">' + appName.replace(/</g,'&lt;') + '</span>';
+    html += '</div>';
     html += '<div>' + selectHtml + '</div>';
     html += '<div><button class="launch-btn" onclick="launchApp(' + i + ')">Launch</button></div>';
-    html += '<span class="traffic-down" id="dl_' + i + '">0.0 MB/s</span>';
-    html += '<span class="traffic-up" id="ul_' + i + '">0.0 MB/s</span>';
+    html += '<div class="traffic-cell" id="traffic_' + i + '"><span class="traffic-down">\u2193 0.0 MB/s</span><span class="traffic-up">\u2191 0.0 MB/s</span></div>';
     html += '<div><button class="remove-btn" onclick="removeApp(' + i + ')">&#10005;</button></div>';
     html += '</div>';
   }
@@ -261,9 +281,10 @@ function renderApps() {
       if (sel) {
         (function(idx, selectEl) {
           pywebview.api.get_rules().then(function(rules) {
+            var appPath = apps[idx].path || apps[idx];
             for (var k = 0; k < (rules.rules || []).length; k++) {
               var rule = rules.rules[k];
-              if (rule.app_path === apps[idx]) {
+              if (rule.app_path === appPath) {
                 var target = rule.adapter_name + '|' + rule.adapter_ip;
                 for (var o = 0; o < selectEl.options.length; o++) {
                   if (selectEl.options[o].value === target) {
@@ -281,7 +302,7 @@ function renderApps() {
 }
 
 function onAssignChange(index, value) {
-  var appPath = apps[index];
+  var appPath = apps[index].path || apps[index];
   if (value === 'Unassigned') {
     pywebview.api.remove_rule(appPath).then(function() {
       pywebview.api.get_rules().then(function() {});
@@ -305,7 +326,7 @@ function addApp() {
 }
 
 function launchApp(index) {
-  var appPath = apps[index];
+  var appPath = apps[index].path || apps[index];
   pywebview.api.get_rules().then(function(rules) {
     var rule = null;
     for (var i = 0; i < (rules.rules || []).length; i++) {
@@ -323,7 +344,7 @@ function launchApp(index) {
 }
 
 function removeApp(index) {
-  var appPath = apps[index];
+  var appPath = apps[index].path || apps[index];
   pywebview.api.remove_app(appPath).then(function() {
     return pywebview.api.get_apps();
   }).then(function(newApps) {
@@ -342,6 +363,7 @@ function refreshAll() {
   pywebview.api.refresh_adapters().then(function(data) {
     adapters = data.adapters || {};
     nicknameMap = data.nicknames || {};
+    apps = data.apps || [];
     renderAdapters();
     renderApps();
     var rules = data.rules || [];
@@ -349,7 +371,7 @@ function refreshAll() {
     for (var i = 0; i < rows.length; i++) {
       var sel = rows[i].querySelector('select');
       if (!sel) continue;
-      var appPath = apps[i];
+      var appPath = apps[i].path || apps[i];
       for (var k = 0; k < rules.length; k++) {
         if (rules[k].app_path === appPath) {
           var target = rules[k].adapter_name + '|' + rules[k].adapter_ip;
@@ -416,19 +438,18 @@ function getStatus() {
 
 function getStats() {
   pywebview.api.get_stats().then(function(stats) {
-    var totalDl = 0;
-    var totalUl = 0;
     for (var i = 0; i < apps.length; i++) {
-      var dlEl = document.getElementById('dl_' + i);
-      var ulEl = document.getElementById('ul_' + i);
-      if (dlEl && ulEl) {
-        var appPath = apps[i];
+      var cell = document.getElementById('traffic_' + i);
+      if (cell) {
+        var appPath = apps[i].path || apps[i];
+        var dlEl = cell.querySelector('.traffic-down');
+        var ulEl = cell.querySelector('.traffic-up');
         if (stats.apps && stats.apps[appPath]) {
-          dlEl.textContent = formatSpeed(stats.apps[appPath].down_mbps);
-          ulEl.textContent = formatSpeed(stats.apps[appPath].up_mbps);
+          dlEl.textContent = '\u2193 ' + formatSpeed(stats.apps[appPath].down_mbps);
+          ulEl.textContent = '\u2191 ' + formatSpeed(stats.apps[appPath].up_mbps);
         } else {
-          dlEl.textContent = '0.0 MB/s';
-          ulEl.textContent = '0.0 MB/s';
+          dlEl.textContent = '\u2193 0.0 MB/s';
+          ulEl.textContent = '\u2191 0.0 MB/s';
         }
       }
     }
