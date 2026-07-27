@@ -1,6 +1,6 @@
 # 🌐 NetSplit
 
-**NetSplit v3.0.0** is a Windows desktop application that lets you route specific applications (like Chrome, Steam, Discord) through specific network adapters (Wi‑Fi, USB tethering, Ethernet) – all from a modern, dark‑themed dashboard.
+**NetSplit v3.1.0** is a Windows desktop application that lets you route specific applications (like Chrome, Steam, Discord) through specific network adapters (Wi‑Fi, USB tethering, Ethernet) – all from a modern, dark‑themed dashboard.
 
 Whether you want to download large files through a mobile hotspot while keeping your games on a low‑latency Wi‑Fi connection, or simply control which app uses which network, NetSplit makes it effortless.
 

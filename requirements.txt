@@ -2,3 +2,4 @@ pywebview
 psutil
 pywin32
 Pillow
+pystray

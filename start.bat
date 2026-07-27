@@ -1,3 +1,2 @@
 @echo off
-python main.py
-pause
+start "" /min wscript.exe "%~dp0start.vbs"

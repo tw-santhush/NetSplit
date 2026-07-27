@@ -9,134 +9,238 @@
 <link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+:root {
+  --bg: #18181B;
+  --text: #FAFAFA;
+  --text-muted: #71717A;
+  --text-dim: #52525B;
+  --card-bg: #27272A;
+  --card-hover: #2F2F35;
+  --border: #3F3F46;
+  --border-subtle: #27272A;
+  --accent: #8B5CF6;
+  --accent-hover: #7C3AED;
+  --danger: #EF4444;
+  --danger-bg: rgba(239,68,68,.15);
+  --input-bg: #27272A;
+  --input-border: #3F3F46;
+  --scrollbar-track: #18181B;
+  --scrollbar-thumb: #3F3F46;
+  --scrollbar-thumb-hover: #52525B;
+  --table-row-alt: #1E1E21;
+  --table-row-hover: #27272A;
+  --green: #4ADE80;
+  --orange: #FB923C;
+  --dialog-overlay: rgba(0,0,0,.5);
+  --toggle-bg: #3F3F46;
+  --toggle-active: #8B5CF6;
+  --qa-btn-text: #D4D4D8;
+  --qa-btn-danger: #FCA5A5;
+}
+[data-theme="light"] {
+  --bg: #F5F5F5;
+  --text: #18181B;
+  --text-muted: #52525B;
+  --text-dim: #A1A1AA;
+  --card-bg: #FFFFFF;
+  --card-hover: #E5E5E5;
+  --border: #E5E5E5;
+  --border-subtle: #E5E5E5;
+  --accent: #8B5CF6;
+  --accent-hover: #7C3AED;
+  --danger: #EF4444;
+  --danger-bg: rgba(239,68,68,.15);
+  --input-bg: #FFFFFF;
+  --input-border: #E5E5E5;
+  --scrollbar-track: #E5E5E5;
+  --scrollbar-thumb: #A1A1AA;
+  --scrollbar-thumb-hover: #71717A;
+  --table-row-alt: #F0F0F0;
+  --table-row-hover: #E5E5E5;
+  --green: #22C55E;
+  --orange: #F97316;
+  --dialog-overlay: rgba(0,0,0,.2);
+  --toggle-bg: #D4D4D8;
+  --toggle-active: #8B5CF6;
+  --qa-btn-text: #52525B;
+  --qa-btn-danger: #EF4444;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#18181B;color:#E4E4E7;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh;display:flex;flex-direction:column}
 ::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:#18181B}
-::-webkit-scrollbar-thumb{background:#3F3F46;border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:#52525B}
+::-webkit-scrollbar-track{background:var(--scrollbar-track)}
+::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--scrollbar-thumb-hover)}
 
 /* Top Bar */
-.top-bar{display:flex;align-items:center;padding:10px 20px;background:#18181B;border-bottom:1px solid #27272A;height:52px;flex-shrink:0}
-.top-bar .logo{width:28px;height:28px;background:#8B5CF6;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;margin-right:10px}
-.top-bar .app-title{font-weight:700;font-size:16px;color:#E4E4E7}
-.top-bar .status-dot{width:10px;height:10px;border-radius:50%;background:#71717A;margin-left:16px;transition:background .3s}
+.top-bar{display:flex;align-items:center;padding:10px 20px;background:var(--bg);border-bottom:1px solid var(--border-subtle);height:52px;flex-shrink:0}
+.top-bar .logo{width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;margin-right:10px}
+.top-bar .app-title{font-weight:700;font-size:16px;color:var(--text)}
+.top-bar .status-dot{width:10px;height:10px;border-radius:50%;background:var(--text-muted);margin-left:16px;transition:background .3s}
 .top-bar .status-dot.active{background:#22C55E;box-shadow:0 0 8px rgba(34,197,94,.4)}
-.top-bar .status-text{font-size:13px;color:#71717A;margin-left:6px}
+.top-bar .status-text{font-size:13px;color:var(--text-muted);margin-left:6px}
 .top-bar .spacer{flex:1}
-.top-bar .refresh-btn{background:none;border:none;color:#71717A;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;transition:color .15s,background .15s;margin-right:12px}
-.top-bar .refresh-btn:hover{color:#8B5CF6;background:#27272A}
-.top-bar .version{font-size:12px;color:#52525B}
+.top-bar .refresh-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;transition:color .15s,background .15s;margin-right:12px}
+.top-bar .refresh-btn:hover{color:var(--accent);background:var(--card-bg)}
+.top-bar .refresh-btn.spin{animation:spin 1s linear infinite;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.left-panel .panel-header .refresh-status{font-size:10px;color:var(--text-dim);white-space:nowrap;transition:color .3s;flex:none;margin-left:8px}
+.left-panel .panel-header .refresh-status.active{color:#22C55E}
+.top-bar .version{font-size:12px;color:var(--text-dim)}
 
 /* Main Content */
 .main-content{display:flex;flex:1;overflow:hidden}
 
 /* Left Panel */
-.left-panel{width:30%;min-width:280px;background:#18181B;border-right:1px solid #27272A;display:flex;flex-direction:column;flex-shrink:0}
-.left-panel .panel-header{display:flex;align-items:center;padding:14px 16px 10px;font-weight:600;font-size:14px;color:#E4E4E7;border-bottom:1px solid #27272A;flex-shrink:0}
+.left-panel{width:30%;min-width:280px;background:var(--bg);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;flex-shrink:0}
+.left-panel .panel-header{display:flex;align-items:center;padding:14px 16px 10px;font-weight:600;font-size:14px;color:var(--text);border-bottom:1px solid var(--border-subtle);flex-shrink:0}
 .left-panel .panel-header span{flex:1}
 .left-panel .adapter-list{flex:1;overflow-y:auto;padding:8px}
-.left-panel .refresh-adapters-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#A1A1AA;text-decoration:none;cursor:pointer;padding:4px 16px 8px;transition:color .15s ease;background:none;border:none;font-family:'Inter',sans-serif;margin-top:8px;border-top:1px solid #27272A;padding-top:8px}
-.left-panel .refresh-adapters-link:hover{color:#8B5CF6}
-.left-panel .adapter-card{background:#27272A;border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:background .15s;position:relative}
-.left-panel .adapter-card:hover{background:#2F2F35}
+.left-panel .refresh-adapters-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted);text-decoration:none;cursor:pointer;padding:4px 16px 8px;transition:color .15s ease;background:none;border:none;font-family:'Inter',sans-serif;margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px}
+.left-panel .refresh-adapters-link:hover{color:var(--accent)}
+.left-panel .adapter-card{background:var(--card-bg);border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:background .15s;position:relative}
+.left-panel .adapter-card:hover{background:var(--card-hover)}
 .left-panel .adapter-card .top-row{display:flex;align-items:center;gap:8px}
 .left-panel .adapter-card .dot{width:8px;height:8px;border-radius:50%;background:#22C55E;flex-shrink:0}
-.left-panel .adapter-card .adapter-name{font-weight:600;font-size:13px;color:#E4E4E7;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.left-panel .adapter-card .rename-btn{background:none;border:none;color:#71717A;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;transition:color .15s,background .15s}
-.left-panel .adapter-card .rename-btn:hover{color:#8B5CF6;background:#2F2F35}
-.left-panel .adapter-card .info-row{font-size:11px;color:#71717A;margin-top:4px;padding-left:16px;display:flex;gap:12px}
-.left-panel .adapter-card .speed-row{font-size:10px;color:#52525B;margin-top:2px;padding-left:16px;display:flex;gap:12px}
-.left-panel .adapter-card .speed-row .down{color:#4ADE80}
-.left-panel .adapter-card .speed-row .up{color:#FB923C}
-.left-panel .empty-state{padding:20px;text-align:center;color:#52525B;font-size:13px}
+.left-panel .adapter-card .adapter-name{font-weight:600;font-size:13px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.left-panel .adapter-card .rename-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;transition:color .15s,background .15s}
+.left-panel .adapter-card .rename-btn:hover{color:var(--accent);background:var(--card-hover)}
+.left-panel .adapter-card .info-row{font-size:11px;color:var(--text-muted);margin-top:4px;padding-left:16px;display:flex;gap:12px}
+.left-panel .adapter-card .speed-row{font-size:11px;color:var(--text-dim);margin-top:2px;padding-left:16px;display:flex;gap:12px}
+.left-panel .adapter-card .speed-row .down{color:var(--green)}
+.left-panel .adapter-card .speed-row .up{color:var(--orange)}
+.left-panel .empty-state{padding:20px;text-align:center;color:var(--text-dim);font-size:13px}
 
 /* Right Panel */
 .right-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.right-panel .panel-header{display:flex;align-items:center;padding:14px 20px 10px;border-bottom:1px solid #27272A;flex-shrink:0}
-.right-panel .panel-header h2{font-weight:600;font-size:15px;color:#E4E4E7;flex:1}
-.right-panel .panel-header .add-btn{background:#8B5CF6;border:none;color:#fff;padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;font-family:'Inter',sans-serif}
-.right-panel .panel-header .add-btn:hover{background:#7C3AED}
+.right-panel .panel-header{display:flex;align-items:center;padding:14px 20px 10px;border-bottom:1px solid var(--border-subtle);flex-shrink:0}
+.right-panel .panel-header h2{font-weight:600;font-size:15px;color:var(--text);flex:1}
+.right-panel .panel-header .add-btn{background:var(--accent);border:none;color:#fff;padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;font-family:'Inter',sans-serif}
+.right-panel .panel-header .add-btn:hover{background:var(--accent-hover)}
 
 /* Table */
 .table-container{flex:1;overflow-y:auto;padding:8px 16px}
-.table-header{display:grid;grid-template-columns:2fr 2fr auto auto auto;gap:8px;padding:8px 8px 6px;font-size:11px;font-weight:600;color:#71717A;border-bottom:1px solid #27272A;position:sticky;top:0;background:#18181B;z-index:1}
-.table-row{display:grid;grid-template-columns:2fr 2fr auto auto auto;gap:8px;padding:8px;align-items:center;border-radius:6px;transition:background .15s}
-.table-row:nth-child(even){background:#1E1E21}
-.table-row:hover{background:#27272A}
+.table-header{display:grid;grid-template-columns:2fr auto 2fr auto auto;gap:8px;padding:8px 8px 6px;font-size:11px;font-weight:600;color:var(--text-muted);border-bottom:1px solid var(--border-subtle);position:sticky;top:0;z-index:1;background:var(--bg)}
+.table-row{display:grid;grid-template-columns:2fr auto 2fr auto auto;gap:8px;padding:8px;align-items:center;border-radius:6px;transition:background .15s}
+.table-row:nth-of-type(even){background:var(--table-row-alt)}
+.table-row:hover{background:var(--table-row-hover)}
 .table-row .app-cell{display:flex;align-items:center;gap:8px}
 .table-row .app-icon{width:24px;height:24px;border-radius:4px;flex-shrink:0}
-.table-row .app-name{font-size:12px;font-weight:500;color:#E4E4E7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.table-row select{background:#27272A;border:1px solid #3F3F46;color:#E4E4E7;padding:4px 8px;border-radius:6px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;outline:none;max-width:100%}
-.table-row select:focus{border-color:#8B5CF6}
-.table-row .launch-btn{background:#8B5CF6;border:none;color:#fff;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;font-family:'Inter',sans-serif;white-space:nowrap}
-.table-row .launch-btn:hover{background:#7C3AED}
+.table-row .app-name{font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.table-row select{background:var(--input-bg);border:1px solid var(--input-border);color:var(--text);padding:4px 8px;border-radius:6px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;outline:none;max-width:130px}
+.table-row select:focus{border-color:var(--accent)}
+.table-header > div:nth-child(2){padding-right:16px}
+.table-row > div:nth-child(2){padding-right:16px}
+.table-row .launch-btn{background:var(--accent);border:none;color:#fff;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;font-family:'Inter',sans-serif;white-space:nowrap}
+.table-row .launch-btn:hover{background:var(--accent-hover)}
+.table-row .launch-btn.disabled{opacity:.5;pointer-events:none}
 .table-row .traffic-cell{display:flex;flex-direction:column;gap:1px}
-.table-row .traffic-down{font-size:11px;color:#4ADE80;line-height:1.4}
-.table-row .traffic-up{font-size:11px;color:#FB923C;line-height:1.4}
-.table-row .remove-btn{background:none;border:none;color:#EF4444;cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;transition:color .15s,background .15s;font-family:'Inter',sans-serif}
-.table-row .remove-btn:hover{background:rgba(239,68,68,.15)}
-.table-empty{padding:20px;text-align:center;color:#52525B;font-size:13px}
+.table-row .traffic-down{font-size:11px;color:var(--green);line-height:1.4}
+.table-row .traffic-up{font-size:11px;color:var(--orange);line-height:1.4}
+.table-row .remove-btn{background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;transition:color .15s,background .15s;font-family:'Inter',sans-serif;margin-left:8px}
+.table-row .remove-btn:hover{background:var(--danger-bg)}
+.table-empty{padding:20px;text-align:center;color:var(--text-dim);font-size:13px}
 
 /* Log Section */
-.log-section{border-top:1px solid #27272A;flex-shrink:0}
-.log-section .log-header{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid #27272A}
-.log-section .log-header h3{font-weight:600;font-size:13px;color:#E4E4E7;flex:1}
-.log-section .log-header .clear-btn{background:none;border:1px solid #3F3F46;color:#71717A;padding:3px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:color .15s,border-color .15s;font-family:'Inter',sans-serif}
-.log-section .log-header .clear-btn:hover{color:#E4E4E7;border-color:#52525B}
-.log-section .log-content{height:120px;overflow-y:auto;padding:8px 16px;font-size:11px;color:#71717A;font-family:'Consolas','Courier New',monospace;line-height:1.6}
+.log-section{border-top:1px solid var(--border-subtle);flex-shrink:0}
+.log-section .log-header{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border-subtle)}
+.log-section .log-header h3{font-weight:600;font-size:13px;color:var(--text);flex:1}
+.log-section .log-header .clear-btn{background:none;border:1px solid var(--border);color:var(--text-muted);padding:3px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:color .15s,border-color .15s;font-family:'Inter',sans-serif}
+.log-section .log-header .clear-btn:hover{color:var(--text);border-color:var(--text-muted)}
+.log-section .log-content{height:120px;overflow-y:auto;padding:8px 16px;font-size:11px;color:var(--text-muted);font-family:'Consolas','Courier New',monospace;line-height:1.6}
+
+/* Toggle Switch */
+.toggle-wrapper{display:inline-flex;align-items:center;gap:5px;margin-right:8px;cursor:pointer;user-select:none}
+.toggle-switch{position:relative;width:34px;height:18px;background:var(--toggle-bg);border-radius:9px;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle-switch.active{background:var(--toggle-active)}
+.toggle-switch .knob{position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle-switch.active .knob{transform:translateX(16px)}
+.toggle-label{font-size:11px;color:var(--text-muted);white-space:nowrap}
+.toggle-label.active{color:var(--accent)}
+.scan-indicator{width:8px;height:8px;border-radius:50%;background:var(--accent);display:none;flex-shrink:0}
+.scan-indicator.active{display:inline-block;animation:scanPulse 1.2s ease-in-out infinite}
+@keyframes scanPulse{0%,100%{opacity:1}50%{opacity:.25}}
+.theme-toggle{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;border-radius:4px;line-height:1;transition:background .15s;margin-right:8px}
+.theme-toggle:hover{background:var(--card-bg)}
+/* Loading Spinner */
+.loading-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--dialog-overlay);z-index:999;align-items:center;justify-content:center}
+.loading-overlay.show{display:flex}
+.loading-spinner{width:36px;height:36px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:loadSpin .8s linear infinite}
+@keyframes loadSpin{to{transform:rotate(360deg)}}
+/* End Loading Spinner */
+/* End Toggle */
 
 /* Bottom Bar */
-.bottom-bar{display:flex;align-items:center;padding:8px 20px;background:#18181B;border-top:1px solid #27272A;height:40px;flex-shrink:0;gap:20px}
-.bottom-bar .total-down{font-size:13px;font-weight:700;color:#4ADE80}
-.bottom-bar .total-up{font-size:13px;font-weight:700;color:#FB923C}
+.bottom-bar{display:flex;align-items:center;padding:8px 20px;background:var(--bg);border-top:1px solid var(--border-subtle);height:40px;flex-shrink:0;gap:20px}
+.bottom-bar .total-down{font-size:13px;font-weight:700;color:var(--green)}
+.bottom-bar .total-up{font-size:13px;font-weight:700;color:var(--orange)}
 
 /* Dialog Overlay */
-.dialog-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.dialog-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--dialog-overlay);z-index:1000;align-items:center;justify-content:center}
 .dialog-overlay.show{display:flex}
-.dialog-box{background:#27272A;border-radius:12px;padding:20px;width:360px;max-width:90%;border:1px solid #3F3F46}
-.dialog-box h3{font-size:14px;font-weight:600;color:#E4E4E7;margin-bottom:4px}
-.dialog-box p{font-size:12px;color:#71717A;margin-bottom:12px}
-.dialog-box input{width:100%;background:#18181B;border:1px solid #3F3F46;color:#E4E4E7;padding:8px 12px;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;outline:none}
-.dialog-box input:focus{border-color:#8B5CF6}
+.dialog-box{background:var(--card-bg);border-radius:12px;padding:20px;width:360px;max-width:90%;border:1px solid var(--border)}
+.dialog-box h3{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.dialog-box p{font-size:12px;color:var(--text-muted);margin-bottom:12px}
+.dialog-box input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;outline:none}
+.dialog-box input:focus{border-color:var(--accent)}
 .dialog-box .dialog-btns{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
 .dialog-box .dialog-btns button{padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s}
-.dialog-box .dialog-btns .btn-cancel{background:#3F3F46;border:none;color:#E4E4E7}
+.dialog-box .dialog-btns .btn-cancel{background:var(--border);border:none;color:var(--text)}
 .dialog-box .dialog-btns .btn-cancel:hover{opacity:.8}
-.dialog-box .dialog-btns .btn-confirm{background:#8B5CF6;border:none;color:#fff}
+.dialog-box .dialog-btns .btn-confirm{background:var(--accent);border:none;color:#fff}
 .dialog-box .dialog-btns .btn-confirm:hover{opacity:.9}
+
+
+/* Quick Actions */
+.quick-actions{display:flex;gap:6px;padding:8px 16px;border-bottom:1px solid var(--border-subtle);flex-shrink:0;align-items:center}
+.quick-actions .qa-label{font-size:11px;font-weight:600;color:var(--text-muted);margin-right:4px;white-space:nowrap}
+.quick-actions .qa-btn{background:var(--card-bg);border:1px solid var(--border);color:var(--qa-btn-text);padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.quick-actions .qa-btn:hover{background:var(--card-hover);border-color:var(--accent);color:var(--text)}
+.quick-actions .qa-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.quick-actions .qa-btn.primary:hover{background:var(--accent-hover)}
+.quick-actions .qa-btn.danger{color:var(--qa-btn-danger)}
+.quick-actions .qa-btn.danger:hover{border-color:var(--danger);color:var(--qa-btn-danger)}
 </style>
 </head>
 <body>
 
 <div class="top-bar">
-  <div class="logo">N</div>
-  <span class="app-title">NetSplit</span>
   <div class="status-dot" id="statusDot"></div>
   <span class="status-text" id="statusText">Idle</span>
   <div class="spacer"></div>
   <button class="refresh-btn" onclick="refreshAll()" title="Refresh All">&#8635;</button>
-  <span class="version">v3.0.0</span>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+  <span class="version">v3.1.0</span>
 </div>
 
 <div class="main-content">
   <div class="left-panel">
-    <div class="panel-header"><span>Network Adapters</span></div>
+    <div class="panel-header"><span>Network Adapters</span><span class="refresh-status" id="refreshStatus"></span></div>
     <div class="adapter-list" id="adapterList"></div>
-    <div class="refresh-adapters-link" onclick="refreshAll()">↻ Refresh Adapters</div>
+    <div class="refresh-adapters-link" onclick="refreshAdaptersOnly()">↻ Refresh Adapters</div>
   </div>
   <div class="right-panel">
     <div class="panel-header">
       <h2>AppRouting</h2>
+      <div class="toggle-wrapper" id="autoFindToggle" onclick="toggleAutoFind()">
+        <div class="toggle-switch" id="autoFindSwitch"><div class="knob"></div></div>
+        <span class="toggle-label" id="autoFindLabel">Auto Find</span>
+        <div class="scan-indicator" id="scanIndicator"></div>
+      </div>
       <button class="add-btn" onclick="addApp()">+ Add App</button>
+    </div>
+    <div class="quick-actions">
+      <span class="qa-label">Quick Actions</span>
+      <button class="qa-btn" onclick="optimizeAll()" title="Auto-assign unassigned apps to least-loaded adapter">🔄 Optimize All</button>
+      <button class="qa-btn danger" onclick="clearAllRules()" title="Remove all rule assignments">🗑️ Clear All Rules</button>
     </div>
     <div class="table-container">
       <div class="table-header">
-        <span>Application</span>
-        <span>Assigned Network</span>
-        <span>Action</span>
-        <span>Traffic</span>
-        <span></span>
+        <div>Application</div>
+        <div style="text-align:center;justify-self:center">Action</div>
+        <div>Assigned Network</div>
+        <div>Traffic</div>
+        <div>Close</div>
       </div>
       <div id="appsContainer"></div>
     </div>
@@ -167,6 +271,21 @@ body{font-family:'Inter',sans-serif;background:#18181B;color:#E4E4E7;overflow:hi
   </div>
 </div>
 
+<div class="dialog-overlay" id="confirmDialog">
+  <div class="dialog-box">
+    <h3 id="confirmTitle">Confirm</h3>
+    <p id="confirmMessage">Are you sure?</p>
+    <div class="dialog-btns">
+      <button class="btn-cancel" onclick="closeConfirmDialog()">Cancel</button>
+      <button class="btn-confirm" id="confirmBtn" onclick="confirmAction()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+</div>
+
 <script>
 let adapters = {};
 let apps = [];
@@ -174,33 +293,61 @@ let nicknameMap = {};
 let renameTarget = null;
 let pollTimer = null;
 let logTimer = null;
+let autoScanTimer = null;
+let autoScanActive = false;
+let refreshTimer = null;
+let _refreshLock = false;
+let _confirmCallback = null;
 
 function init() {
-  loadAdapters();
-  loadApps();
+  document.getElementById('loadingOverlay').classList.add('show');
+  refreshAll();
   startPolling();
+  startAutoRefresh();
+  loadTheme();
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeToggle').textContent = theme === 'dark' ? '\uD83C\uDF19' : '\u2600\uFE0F';
+}
+
+function toggleTheme() {
+  pywebview.api.toggle_theme().then(function(newTheme) {
+    applyTheme(newTheme);
+  }).catch(function(err) {
+    pywebview.api.add_log('Theme error: ' + (err.message || err));
+  });
+}
+
+function loadTheme() {
+  pywebview.api.get_theme().then(function(theme) {
+    applyTheme(theme);
+  }).catch(function(err) {
+    pywebview.api.add_log('Theme error: ' + (err.message || err));
+  });
 }
 
 function loadAdapters() {
-  pywebview.api.get_adapters().then(function(data) {
+  return pywebview.api.get_adapters().then(function(data) {
     adapters = data;
     renderAdapters();
     renderApps();
   }).catch(function(err) {
-    /* error handled silently */
+    pywebview.api.add_log('Error loading adapters: ' + (err.message || err));
   });
 }
 
 function loadApps() {
-  Promise.all([
+  return Promise.all([
     pywebview.api.get_apps(),
     pywebview.api.get_rules()
   ]).then(function(results) {
     apps = results[0];
     nicknameMap = results[1].nicknames || {};
-    renderApps();
+    renderApps(results[1]);
   }).catch(function(err) {
-    /* error handled silently */
+    pywebview.api.add_log('Error loading apps: ' + (err.message || err));
   });
 }
 
@@ -230,80 +377,75 @@ function renderAdapters() {
   container.innerHTML = html;
 }
 
-function renderApps() {
+function renderApps(ruleData) {
   var container = document.getElementById('appsContainer');
   if (apps.length === 0) {
     container.innerHTML = '<div class="table-empty">No applications added. Click "+ Add App" to begin.</div>';
+    document.getElementById('loadingOverlay').classList.remove('show');
     return;
   }
-  var html = '';
-  for (var i = 0; i < apps.length; i++) {
-    var app = apps[i];
-    var appPath = app.path || app;
-    var appName = app.name || appPath.split('\\').pop().split('/').pop();
-    var appIcon = app.icon || null;
-    var adapterNames = Object.keys(adapters);
-    var selectHtml = '<select onchange="onAssignChange(' + i + ', this.value)" data-index="' + i + '">';
-    selectHtml += '<option value="Unassigned">Unassigned</option>';
-    for (var j = 0; j < adapterNames.length; j++) {
-      var aname = adapterNames[j];
-      var display = nicknameMap[aname] || aname;
-      var val = aname + '|' + adapters[aname].ip;
-      selectHtml += '<option value="' + val.replace(/"/g,'&quot;') + '">' + display.replace(/</g,'&lt;') + ' (' + adapters[aname].ip + ')</option>';
+  var rulesPromise = ruleData && ruleData.rules ? Promise.resolve(ruleData.rules) : pywebview.api.get_rules().then(function(r) { return r.rules || r; });
+  rulesPromise.then(function(data) {
+    var rules = data.rules || data || [];
+    var ruleMap = {};
+    for (var k = 0; k < rules.length; k++) {
+      ruleMap[rules[k].app_path] = rules[k];
     }
-    selectHtml += '</select>';
-
-    html += '<div class="table-row" data-path="' + appPath.replace(/"/g,'&quot;') + '">';
-    html += '<div class="app-cell">';
-    html += '<img class="app-icon" src="' + (appIcon || '').replace(/"/g,'&quot;') + '" width="24" height="24" alt="">';
-    html += '<span class="app-name" title="' + appPath.replace(/"/g,'&quot;') + '">' + appName.replace(/</g,'&lt;') + '</span>';
-    html += '</div>';
-    html += '<div>' + selectHtml + '</div>';
-    html += '<div><button class="launch-btn" onclick="launchApp(' + i + ')">Launch</button></div>';
-    html += '<div class="traffic-cell" id="traffic_' + i + '"><span class="traffic-down">\u2193 0.0 MB/s</span><span class="traffic-up">\u2191 0.0 MB/s</span></div>';
-    html += '<div><button class="remove-btn" onclick="removeApp(' + i + ')">&#10005;</button></div>';
-    html += '</div>';
-  }
-  container.innerHTML = html;
-  for (var i = 0; i < apps.length; i++) {
-    var rows = container.querySelectorAll('.table-row');
-    if (rows[i]) {
-      var sel = rows[i].querySelector('select');
-      if (sel) {
-        (function(idx, selectEl) {
-          pywebview.api.get_rules().then(function(rules) {
-            var appPath = apps[idx].path || apps[idx];
-            for (var k = 0; k < (rules.rules || []).length; k++) {
-              var rule = rules.rules[k];
-              if (rule.app_path === appPath) {
-                var target = rule.adapter_name + '|' + rule.adapter_ip;
-                for (var o = 0; o < selectEl.options.length; o++) {
-                  if (selectEl.options[o].value === target) {
-                    selectEl.value = target;
-                    break;
-                  }
-                }
-              }
-            }
-          });
-        })(i, sel);
+    var html = '';
+    for (var i = 0; i < apps.length; i++) {
+      var app = apps[i];
+      var appPath = app.path || app;
+      var appName = app.name || appPath.split('\\').pop().split('/').pop();
+      var appIcon = app.icon || null;
+      var rule = ruleMap[appPath];
+      var hasRule = !!rule;
+      var adapterNames = Object.keys(adapters);
+      var selectHtml = '<select onchange="onAssignChange(' + i + ', this.value)" data-index="' + i + '">';
+      selectHtml += '<option value="Unassigned">Unassigned</option>';
+      for (var j = 0; j < adapterNames.length; j++) {
+        var aname = adapterNames[j];
+        var display = nicknameMap[aname] || aname;
+        var val = aname + '|' + adapters[aname].ip;
+        var selected = (hasRule && rule.adapter_name === aname) ? ' selected' : '';
+        selectHtml += '<option value="' + val.replace(/"/g,'&quot;') + '"' + selected + '>' + display.replace(/</g,'&lt;') + ' (' + adapters[aname].ip + ')</option>';
       }
+      selectHtml += '</select>';
+
+      html += '<div class="table-row" data-path="' + appPath.replace(/"/g,'&quot;') + '">';
+      html += '<div class="app-cell">';
+      html += '<img class="app-icon" src="' + (appIcon || '').replace(/"/g,'&quot;') + '" width="24" height="24" alt="">';
+      html += '<span class="app-name" title="' + appPath.replace(/"/g,'&quot;') + '">' + appName.replace(/</g,'&lt;') + '</span>';
+      html += '</div>';
+      html += '<div><button class="launch-btn' + (hasRule ? '' : ' disabled') + '" onclick="launchApp(' + i + ')"' + (hasRule ? '' : ' disabled') + '>Launch</button></div>';
+      html += '<div>' + selectHtml + '</div>';
+      html += '<div class="traffic-cell" id="traffic_' + i + '"><span class="traffic-down">\u2193 0.0 MB/s</span><span class="traffic-up">\u2191 0.0 MB/s</span></div>';
+      html += '<div><button class="remove-btn" onclick="removeApp(' + i + ')">&#10005;</button></div>';
+      html += '</div>';
     }
-  }
+    container.innerHTML = html;
+    document.getElementById('loadingOverlay').classList.remove('show');
+  }).catch(function(err) {
+    pywebview.api.add_log('Error rendering apps: ' + (err.message || err));
+    document.getElementById('loadingOverlay').classList.remove('show');
+  });
 }
 
 function onAssignChange(index, value) {
   var appPath = apps[index].path || apps[index];
   if (value === 'Unassigned') {
     pywebview.api.remove_rule(appPath).then(function() {
-      pywebview.api.get_rules().then(function() {});
+      refreshAll();
+    }).catch(function(err) {
+      pywebview.api.add_log('Error removing rule: ' + (err.message || err));
     });
   } else {
     var parts = value.split('|');
     var adapterName = parts[0];
     var adapterIp = parts[1];
     pywebview.api.add_rule(appPath, adapterName, adapterIp).then(function() {
-      pywebview.api.get_rules().then(function() {});
+      refreshAll();
+    }).catch(function(err) {
+      pywebview.api.add_log('Error adding rule: ' + (err.message || err));
     });
   }
 }
@@ -313,6 +455,8 @@ function addApp() {
     if (result) {
       loadApps();
     }
+  }).catch(function(err) {
+    pywebview.api.add_log('Error adding app: ' + (err.message || err));
   });
 }
 
@@ -327,10 +471,12 @@ function launchApp(index) {
       }
     }
     if (!rule) {
-      alert('Please assign a network adapter first.');
+      pywebview.api.add_log('Cannot launch: no adapter assigned to ' + appPath.split('\\').pop().split('/').pop());
       return;
     }
     pywebview.api.launch_app(appPath, rule.adapter_name);
+  }).catch(function(err) {
+    pywebview.api.add_log('Launch error: ' + (err.message || err));
   });
 }
 
@@ -341,41 +487,175 @@ function removeApp(index) {
   }).then(function(newApps) {
     apps = newApps;
     renderApps();
+  }).catch(function(err) {
+    pywebview.api.add_log('Error removing app: ' + (err.message || err));
   });
+}
+
+function toggleAutoFind() {
+  autoScanActive = !autoScanActive;
+  var sw = document.getElementById('autoFindSwitch');
+  var lbl = document.getElementById('autoFindLabel');
+  var ind = document.getElementById('scanIndicator');
+  if (autoScanActive) {
+    sw.classList.add('active');
+    lbl.classList.add('active');
+    ind.classList.add('active');
+    startAutoScan();
+  } else {
+    sw.classList.remove('active');
+    lbl.classList.remove('active');
+    ind.classList.remove('active');
+    stopAutoScan();
+  }
+}
+
+function startAutoScan() {
+  doAutoScan();
+  autoScanTimer = setInterval(doAutoScan, 5000);
+}
+
+function stopAutoScan() {
+  if (autoScanTimer) {
+    clearInterval(autoScanTimer);
+    autoScanTimer = null;
+  }
+}
+
+function doAutoScan() {
+  if (_refreshLock) return;
+  _refreshLock = true;
+  pywebview.api.get_running_apps().then(function(runningApps) {
+    var currentPaths = {};
+    for (var i = 0; i < apps.length; i++) {
+      currentPaths[apps[i].path || apps[i]] = true;
+    }
+    var toAdd = [];
+    for (var j = 0; j < runningApps.length && (apps.length + toAdd.length) < 20; j++) {
+      if (!currentPaths[runningApps[j].path]) {
+        currentPaths[runningApps[j].path] = true;
+        toAdd.push(runningApps[j].path);
+      }
+    }
+    if (toAdd.length === 0) { _refreshLock = false; return null; }
+    return Promise.all(toAdd.map(function(path) { return pywebview.api.add_app(path); }));
+  }).then(function(result) {
+    if (result === null) return;
+    return loadApps();
+  }).then(function() {
+    _refreshLock = false;
+  }).catch(function(err) {
+    _refreshLock = false;
+    pywebview.api.add_log('Auto-scan error: ' + (err.message || err));
+  });
+}
+
+function optimizeAll() {
+  pywebview.api.optimize_rules().then(function(result) {
+    if (result.error) {
+      pywebview.api.add_log(result.error).then(function() { refreshAll(); });
+      return;
+    }
+    if (result.count === 0) {
+      return;
+    }
+    refreshAll();
+  }).catch(function(err) {
+    pywebview.api.add_log('Optimize error: ' + (err.message || err));
+  });
+}
+
+function clearAllRules() {
+  showConfirmDialog('Clear All Rules', 'Are you sure you want to clear all rules?', function() {
+    pywebview.api.clear_all_rules().then(function() {
+      refreshAll();
+    }).catch(function(err) {
+      pywebview.api.add_log('Error clearing rules: ' + (err.message || err));
+    });
+  });
+}
+
+function showConfirmDialog(title, message, callback) {
+  _confirmCallback = callback;
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMessage').textContent = message;
+  document.getElementById('confirmDialog').classList.add('show');
+}
+
+function closeConfirmDialog() {
+  document.getElementById('confirmDialog').classList.remove('show');
+  _confirmCallback = null;
+}
+
+function confirmAction() {
+  closeConfirmDialog();
+  if (_confirmCallback) _confirmCallback();
 }
 
 function clearLogs() {
   pywebview.api.clear_logs().then(function() {
     document.getElementById('logContent').innerHTML = '';
+  }).catch(function(err) {
+    pywebview.api.add_log('Clear logs error: ' + (err.message || err));
   });
 }
 
 function refreshAll() {
+  if (document.hidden) { document.getElementById('loadingOverlay').classList.remove('show'); return; }
+  var btn = document.querySelector('.refresh-btn');
+  if (btn) btn.classList.add('spin');
   pywebview.api.refresh_adapters().then(function(data) {
     adapters = data.adapters || {};
     nicknameMap = data.nicknames || {};
     apps = data.apps || [];
     renderAdapters();
-    renderApps();
-    var rules = data.rules || [];
-    var rows = document.querySelectorAll('.table-row');
-    for (var i = 0; i < rows.length; i++) {
-      var sel = rows[i].querySelector('select');
-      if (!sel) continue;
-      var appPath = apps[i].path || apps[i];
-      for (var k = 0; k < rules.length; k++) {
-        if (rules[k].app_path === appPath) {
-          var target = rules[k].adapter_name + '|' + rules[k].adapter_ip;
-          for (var o = 0; o < sel.options.length; o++) {
-            if (sel.options[o].value === target) {
-              sel.value = target;
-              break;
-            }
-          }
-        }
-      }
-    }
+    renderApps(data);
+    updateRefreshTimestamp();
+    document.getElementById('loadingOverlay').classList.remove('show');
+  }).catch(function(err) {
+    pywebview.api.add_log('Refresh error: ' + (err.message || err));
+    document.getElementById('loadingOverlay').classList.remove('show');
+  }).finally(function() {
+    if (btn) btn.classList.remove('spin');
   });
+}
+
+function refreshAdaptersOnly() {
+  if (document.hidden) return;
+  if (_refreshLock) return;
+  _refreshLock = true;
+  var el = document.getElementById('refreshStatus');
+  if (el) el.textContent = 'Refreshing...';
+  pywebview.api.refresh_adapters().then(function(data) {
+    adapters = data.adapters || {};
+    nicknameMap = data.nicknames || {};
+    renderAdapters();
+    renderApps(data);
+    updateRefreshTimestamp();
+  }).catch(function(err) {
+    pywebview.api.add_log('Refresh error: ' + (err.message || err));
+  }).then(function() {
+    _refreshLock = false;
+  });
+}
+
+function updateRefreshTimestamp() {
+  var el = document.getElementById('refreshStatus');
+  if (!el) return;
+  var now = new Date();
+  var h = String(now.getHours()).padStart(2,'0');
+  var m = String(now.getMinutes()).padStart(2,'0');
+  var s = String(now.getSeconds()).padStart(2,'0');
+  el.textContent = 'Last updated: ' + h + ':' + m + ':' + s;
+  el.classList.add('active');
+}
+
+function startAutoRefresh() {
+  refreshTimer = setInterval(function() {
+    if (document.hidden) return;
+    if (_refreshLock) return;
+    refreshAdaptersOnly();
+  }, 5000);
 }
 
 function openRenameDialog(name) {
@@ -399,6 +679,8 @@ function confirmRename() {
       closeRenameDialog();
       renderAdapters();
       renderApps();
+    }).catch(function(err) {
+      pywebview.api.add_log('Rename error: ' + (err.message || err));
     });
   }
 }
@@ -424,20 +706,29 @@ function getStatus() {
       text.textContent = 'Idle';
       text.style.color = '#71717A';
     }
+  }).catch(function(err) {
+    pywebview.api.add_log('Status error: ' + (err.message || err));
   });
 }
 
 function getStats() {
-  pywebview.api.get_stats().then(function(stats) {
+  if (document.hidden) return;
+  Promise.all([
+    pywebview.api.get_stats(),
+    pywebview.api.get_app_traffic()
+  ]).then(function(results) {
+    var stats = results[0];
+    var appTraffic = results[1] || {};
     for (var i = 0; i < apps.length; i++) {
       var cell = document.getElementById('traffic_' + i);
       if (cell) {
         var appPath = apps[i].path || apps[i];
         var dlEl = cell.querySelector('.traffic-down');
         var ulEl = cell.querySelector('.traffic-up');
-        if (stats.apps && stats.apps[appPath]) {
-          dlEl.textContent = '\u2193 ' + formatSpeed(stats.apps[appPath].down_mbps);
-          ulEl.textContent = '\u2191 ' + formatSpeed(stats.apps[appPath].up_mbps);
+        var t = appTraffic[appPath];
+        if (t) {
+          dlEl.textContent = '\u2193 ' + formatSpeed(t.down_mbps);
+          ulEl.textContent = '\u2191 ' + formatSpeed(t.up_mbps);
         } else {
           dlEl.textContent = '\u2193 0.0 MB/s';
           ulEl.textContent = '\u2191 0.0 MB/s';
@@ -448,6 +739,8 @@ function getStats() {
     document.getElementById('totalUp').textContent = '\u2191 ' + formatSpeed(stats.total_up_mbps || 0);
     updateAdapterSpeeds(stats.adapters || {});
     getStatus();
+  }).catch(function(err) {
+    pywebview.api.add_log('Stats error: ' + (err.message || err));
   });
 }
 
@@ -471,6 +764,8 @@ function getLogs() {
   pywebview.api.get_logs().then(function(logs) {
     var el = document.getElementById('logContent');
     el.innerHTML = logs;
+  }).catch(function(err) {
+    pywebview.api.add_log('Log fetch error: ' + (err.message || err));
   });
 }
 
@@ -495,5 +790,6 @@ document.getElementById('renameInput').addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeRenameDialog();
 });
 </script>
+
 </body>
 </html>

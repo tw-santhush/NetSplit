@@ -8,6 +8,9 @@ def ensure_path(path=None):
     return path or CONFIG_FILE
 
 
+STALE_KEYS = {"force_bind_blacklist", "compat_mode_blacklist", "close_action"}
+
+
 def load_config(path=None):
     path = ensure_path(path)
     if not os.path.isfile(path):
@@ -15,6 +18,8 @@ def load_config(path=None):
     try:
         with open(path) as f:
             data = json.load(f)
+        for key in STALE_KEYS:
+            data.pop(key, None)
         data.setdefault("apps", [])
         data.setdefault("rules", [])
         data.setdefault("nicknames", {})
@@ -25,8 +30,10 @@ def load_config(path=None):
 
 def save_config(config, path=None):
     path = ensure_path(path)
-    with open(path, "w") as f:
+    tmp = path + ".tmp"
+    with open(tmp, "w") as f:
         json.dump(config, f, indent=2)
+    os.replace(tmp, path)
 
 
 def add_rule(config, app_path, adapter_name, adapter_ip):
@@ -58,4 +65,13 @@ def set_nickname(config, system_name, nickname):
         config["nicknames"][system_name] = nickname
     else:
         config["nicknames"].pop(system_name, None)
+    return config
+
+
+def get_theme(config):
+    return config.get("theme", "dark")
+
+
+def set_theme(config, theme):
+    config["theme"] = theme
     return config
