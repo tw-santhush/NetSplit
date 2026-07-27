@@ -37,6 +37,40 @@ def refresh_adapter_data():
         return {}
 
 
+STATS = {}
+_stats_lock = threading.Lock()
+
+
+def _stats_monitor():
+    prev = {}
+    while True:
+        time.sleep(1)
+        try:
+            current = psutil.net_io_counters(pernic=True)
+        except Exception:
+            continue
+        adapter_speeds = {}
+        total_down = 0.0
+        total_up = 0.0
+        for name, cur in current.items():
+            if name in prev:
+                prev_nic = prev[name]
+                dl_bytes = max(0, cur.bytes_recv - prev_nic.bytes_recv)
+                ul_bytes = max(0, cur.bytes_sent - prev_nic.bytes_sent)
+                dl_mbps = dl_bytes / (1024 * 1024)
+                ul_mbps = ul_bytes / (1024 * 1024)
+                adapter_speeds[name] = {"down_mbps": dl_mbps, "up_mbps": ul_mbps}
+                total_down += dl_mbps
+                total_up += ul_mbps
+            else:
+                adapter_speeds[name] = {"down_mbps": 0.0, "up_mbps": 0.0}
+        prev = current
+        with _stats_lock:
+            STATS["adapters"] = adapter_speeds
+            STATS["total_down_mbps"] = total_down
+            STATS["total_up_mbps"] = total_up
+
+
 class Api:
 
     def __init__(self):
@@ -44,7 +78,6 @@ class Api:
         self.adapters = {}
         self.log_buffer = []
         self.routing_active = False
-        self._prev_io = {}
         self._log("NetSplit v2.0.0 started")
 
     def _log(self, message):
@@ -147,28 +180,22 @@ class Api:
         return True
 
     def get_stats(self):
-        try:
-            current = psutil.net_io_counters(pernic=True)
-        except Exception:
-            current = {}
-        stats = {}
-        for app_path in self.config.get("apps", []):
-            rules = get_rules(self.config)
-            adapter_name = None
-            for r in rules:
-                if r["app_path"] == app_path:
-                    adapter_name = r["adapter_name"]
-                    break
-            if adapter_name and adapter_name in current and adapter_name in self._prev_io:
-                prev = self._prev_io[adapter_name]
-                cur = current[adapter_name]
-                dl = max(0, cur.bytes_recv - prev.bytes_recv)
-                ul = max(0, cur.bytes_sent - prev.bytes_sent)
-                stats[app_path] = {"down": dl, "up": ul}
+        with _stats_lock:
+            stats_copy = {
+                "adapters": dict(STATS.get("adapters", {})),
+                "total_down_mbps": STATS.get("total_down_mbps", 0.0),
+                "total_up_mbps": STATS.get("total_up_mbps", 0.0),
+            }
+        rules = get_rules(self.config)
+        apps_stats = {}
+        for r in rules:
+            aname = r["adapter_name"]
+            if aname in stats_copy["adapters"]:
+                apps_stats[r["app_path"]] = dict(stats_copy["adapters"][aname])
             else:
-                stats[app_path] = {"down": 0, "up": 0}
-        self._prev_io = current
-        return stats
+                apps_stats[r["app_path"]] = {"down_mbps": 0.0, "up_mbps": 0.0}
+        stats_copy["apps"] = apps_stats
+        return stats_copy
 
 
 def main():
@@ -181,6 +208,7 @@ def main():
             return
 
     api = Api()
+    threading.Thread(target=_stats_monitor, daemon=True).start()
     window = webview.create_window(
         "NetSplit",
         "ui/index.html",
