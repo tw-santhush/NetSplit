@@ -116,7 +116,7 @@ body{font-family:'Inter',sans-serif;background:#18181B;color:#E4E4E7;overflow:hi
   <span class="status-text" id="statusText">Idle</span>
   <div class="spacer"></div>
   <button class="refresh-btn" onclick="refreshAll()" title="Refresh All">&#8635;</button>
-  <span class="version">v2.0.0</span>
+  <span class="version">v3.0.0</span>
 </div>
 
 <div class="main-content">
@@ -187,7 +187,7 @@ function loadAdapters() {
     renderAdapters();
     renderApps();
   }).catch(function(err) {
-    console.error('[loadAdapters] ERROR:', err);
+    /* error handled silently */
   });
 }
 
@@ -198,14 +198,9 @@ function loadApps() {
   ]).then(function(results) {
     apps = results[0];
     nicknameMap = results[1].nicknames || {};
-    console.log('[loadApps] apps count:', apps.length);
-    if (apps.length > 0) {
-      console.log('[loadApps] first app icon length:', (apps[0].icon || '').length);
-      console.log('[loadApps] first app icon starts with:', (apps[0].icon || '').substring(0, 40));
-    }
     renderApps();
   }).catch(function(err) {
-    console.error('[loadApps] ERROR:', err);
+    /* error handled silently */
   });
 }
 
@@ -247,11 +242,6 @@ function renderApps() {
     var appPath = app.path || app;
     var appName = app.name || appPath.split('\\').pop().split('/').pop();
     var appIcon = app.icon || null;
-    if (appIcon) {
-      console.log('[renderApps] app', i, 'icon length:', appIcon.length, 'prefix:', appIcon.substring(0, 40));
-    } else {
-      console.log('[renderApps] app', i, 'icon is NULL');
-    }
     var adapterNames = Object.keys(adapters);
     var selectHtml = '<select onchange="onAssignChange(' + i + ', this.value)" data-index="' + i + '">';
     selectHtml += '<option value="Unassigned">Unassigned</option>';

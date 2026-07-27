@@ -1,3 +1,5 @@
+VERSION = "3.0.0"
+
 import webview
 import threading
 import time
@@ -14,7 +16,6 @@ from datetime import datetime
 import win32ui
 import win32gui
 import win32con
-import win32api
 from PIL import Image, ImageDraw, ImageFont
 
 from network_scanner import get_all_adapters
@@ -225,7 +226,10 @@ class Api:
         self.adapters = {}
         self.log_buffer = []
         self.routing_active = False
-        self._log("NetSplit v2.0.0 started")
+        self._log("NetSplit v3.0.0 started")
+
+    def get_version(self):
+        return VERSION
 
     def _log(self, message):
         timestamp = datetime.now().strftime("%H:%M:%S")

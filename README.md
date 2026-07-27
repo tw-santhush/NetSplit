@@ -1,6 +1,6 @@
 # 🌐 NetSplit
 
-**NetSplit** is a Windows desktop application that lets you route specific applications (like Chrome, Steam, Discord) through specific network adapters (Wi‑Fi, USB tethering, Ethernet) – all from a modern, dark‑themed dashboard.
+**NetSplit v3.0.0** is a Windows desktop application that lets you route specific applications (like Chrome, Steam, Discord) through specific network adapters (Wi‑Fi, USB tethering, Ethernet) – all from a modern, dark‑themed dashboard.
 
 Whether you want to download large files through a mobile hotspot while keeping your games on a low‑latency Wi‑Fi connection, or simply control which app uses which network, NetSplit makes it effortless.
 
@@ -8,15 +8,13 @@ Whether you want to download large files through a mobile hotspot while keeping 
 
 ## ✨ Features
 
-- **🎯 Application Routing** – Assign any `.exe` to a specific network adapter.
-- **📶 Live Network Monitor** – See real‑time download/upload speeds for every adapter and per‑app traffic.
-- **🖼️ Real App Icons** – Extracts and displays the original Windows icon for each added application.
-- **✏️ Adapter Nicknames** – Rename adapters to something meaningful (e.g., "Home Wi‑Fi", "USB Tether").
-- **🔄 Refresh Adapters** – Re‑scan for new network adapters without restarting the app.
-- **📋 System Activity Log** – Timestamped log of all actions (add/remove, launch, assignment changes).
-- **💾 Persistent Configuration** – All rules, nicknames, and apps are saved in `config.json`.
-- **⚡ One‑Click Launch** – Launch any assigned app with its dedicated network route.
-- **🖥️ Native & Lightweight** – Built with Python + PyWebView (uses system webview, no bundled Chromium).
+- ✅ **Add apps (file picker)** – Browse and add any `.exe` with a native file picker.
+- ✅ **Assign apps to adapters (dropdown)** – Select which network adapter each app uses.
+- ✅ **Launch apps (routing works)** – Launch any assigned app with its dedicated network route.
+- ✅ **Live network monitor** – Real‑time download/upload speeds per adapter and per app.
+- ✅ **Rename adapters** – Give adapters custom nicknames (e.g., "Home Wi‑Fi", "USB Tether").
+- ✅ **System activity log** – Timestamped log of all actions.
+- ✅ **One‑click start (start.bat)** – Launch with a single batch file.
 
 ---
 
@@ -144,6 +142,15 @@ NetSplit uses a combination of techniques to route traffic:
 - **Windows Routing Table** – Temporarily adjusts the default route so that traffic from the launched app is directed through the chosen adapter.
 - **psutil** – Polls network statistics every second to provide live speed updates.
 - **PyWebView** – Provides a native window and allows JavaScript to call Python functions directly – no API mismatches, no CORS, no Electron bloat.
+
+---
+
+## ⚠️ Known Issues
+
+- **Administrator privileges required** – NetSplit modifies Windows routing tables, so it must be run as admin.
+- **ForceBindIP** – The app auto-downloads ForceBindIP on first run. Some antivirus software may flag it as suspicious; this is a false positive.
+- **Adapter detection** – Virtual adapters (Hyper‑V, VMware, VirtualBox) are intentionally hidden to avoid confusion.
+- **Single‑instance routing** – Only one app can be actively routed at a time. Routing resets when the app exits.
 
 ---
 
