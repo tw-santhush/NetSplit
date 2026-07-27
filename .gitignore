@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+electron/node_modules/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+backend/tools/
+
+# Build output
+frontend/dist/
+dist-electron/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
+
+# Config
+backend/tools/ForceBindIP/

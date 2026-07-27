@@ -1,0 +1,13 @@
+{
+  "apps": [
+    "C:/Program Files/Google/Chrome/Application/chrome.exe"
+  ],
+  "rules": [
+    {
+      "app_path": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+      "adapter_name": "Ethernet",
+      "adapter_ip": "169.254.46.26"
+    }
+  ],
+  "nicknames": {}
+}
