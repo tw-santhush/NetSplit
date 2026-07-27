@@ -1,13 +1,16 @@
 {
   "apps": [
-    "C:/Program Files/Google/Chrome/Application/chrome.exe"
+    "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
   ],
   "rules": [
     {
-      "app_path": "C:/Program Files/Google/Chrome/Application/chrome.exe",
-      "adapter_name": "Ethernet",
-      "adapter_ip": "169.254.46.26"
+      "app_path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "adapter_name": "Wi-Fi",
+      "adapter_ip": "10.76.130.126"
     }
   ],
-  "nicknames": {}
+  "nicknames": {
+    "Wi-Fi": "WireLess WIFI",
+    "Ethernet 2": "USB"
+  }
 }
