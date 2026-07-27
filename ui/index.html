@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetSplit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#18181B;color:#E4E4E7;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#18181B}
+::-webkit-scrollbar-thumb{background:#3F3F46;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#52525B}
+
+/* Top Bar */
+.top-bar{display:flex;align-items:center;padding:10px 20px;background:#18181B;border-bottom:1px solid #27272A;height:52px;flex-shrink:0}
+.top-bar .logo{width:28px;height:28px;background:#8B5CF6;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;margin-right:10px}
+.top-bar .app-title{font-weight:700;font-size:16px;color:#E4E4E7}
+.top-bar .status-dot{width:10px;height:10px;border-radius:50%;background:#71717A;margin-left:16px;transition:background .3s}
+.top-bar .status-dot.active{background:#22C55E;box-shadow:0 0 8px rgba(34,197,94,.4)}
+.top-bar .status-text{font-size:13px;color:#71717A;margin-left:6px}
+.top-bar .spacer{flex:1}
+.top-bar .refresh-btn{background:none;border:none;color:#71717A;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;transition:color .15s,background .15s;margin-right:12px}
+.top-bar .refresh-btn:hover{color:#8B5CF6;background:#27272A}
+.top-bar .version{font-size:12px;color:#52525B}
+
+/* Main Content */
+.main-content{display:flex;flex:1;overflow:hidden}
+
+/* Left Panel */
+.left-panel{width:30%;min-width:280px;background:#18181B;border-right:1px solid #27272A;display:flex;flex-direction:column;flex-shrink:0}
+.left-panel .panel-header{display:flex;align-items:center;padding:14px 16px 10px;font-weight:600;font-size:14px;color:#E4E4E7;border-bottom:1px solid #27272A;flex-shrink:0}
+.left-panel .panel-header span{flex:1}
+.left-panel .panel-header .refresh-btn{background:none;border:none;color:#71717A;cursor:pointer;font-size:15px;padding:2px 6px;border-radius:4px;transition:color .15s,background .15s}
+.left-panel .panel-header .refresh-btn:hover{color:#8B5CF6;background:#27272A}
+.left-panel .adapter-list{flex:1;overflow-y:auto;padding:8px}
+.left-panel .adapter-card{background:#27272A;border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:background .15s;position:relative}
+.left-panel .adapter-card:hover{background:#2F2F35}
+.left-panel .adapter-card .top-row{display:flex;align-items:center;gap:8px}
+.left-panel .adapter-card .dot{width:8px;height:8px;border-radius:50%;background:#22C55E;flex-shrink:0}
+.left-panel .adapter-card .adapter-name{font-weight:600;font-size:13px;color:#E4E4E7;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.left-panel .adapter-card .rename-btn{background:none;border:none;color:#71717A;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;transition:color .15s,background .15s}
+.left-panel .adapter-card .rename-btn:hover{color:#8B5CF6;background:#2F2F35}
+.left-panel .adapter-card .info-row{font-size:11px;color:#71717A;margin-top:4px;padding-left:16px}
+.left-panel .adapter-card .info-row span{margin-right:12px}
+.left-panel .empty-state{padding:20px;text-align:center;color:#52525B;font-size:13px}
+
+/* Right Panel */
+.right-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.right-panel .panel-header{display:flex;align-items:center;padding:14px 20px 10px;border-bottom:1px solid #27272A;flex-shrink:0}
+.right-panel .panel-header h2{font-weight:600;font-size:15px;color:#E4E4E7;flex:1}
+.right-panel .panel-header .add-btn{background:#8B5CF6;border:none;color:#fff;padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;font-family:'Inter',sans-serif}
+.right-panel .panel-header .add-btn:hover{background:#7C3AED}
+
+/* Table */
+.table-container{flex:1;overflow-y:auto;padding:8px 16px}
+.table-header{display:grid;grid-template-columns:2fr 2fr auto auto auto auto;gap:8px;padding:8px 8px 6px;font-size:11px;font-weight:600;color:#71717A;border-bottom:1px solid #27272A;position:sticky;top:0;background:#18181B;z-index:1}
+.table-row{display:grid;grid-template-columns:2fr 2fr auto auto auto auto;gap:8px;padding:8px;align-items:center;border-radius:6px;transition:background .15s}
+.table-row:nth-child(even){background:#1E1E21}
+.table-row:hover{background:#27272A}
+.table-row .app-name{font-size:12px;font-weight:500;color:#E4E4E7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.table-row select{background:#27272A;border:1px solid #3F3F46;color:#E4E4E7;padding:4px 8px;border-radius:6px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer;outline:none;max-width:100%}
+.table-row select:focus{border-color:#8B5CF6}
+.table-row .launch-btn{background:#8B5CF6;border:none;color:#fff;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:background .15s;font-family:'Inter',sans-serif;white-space:nowrap}
+.table-row .launch-btn:hover{background:#7C3AED}
+.table-row .traffic-down{font-size:11px;color:#4ADE80;white-space:nowrap}
+.table-row .traffic-up{font-size:11px;color:#FB923C;white-space:nowrap}
+.table-row .remove-btn{background:none;border:none;color:#EF4444;cursor:pointer;font-size:13px;padding:2px 4px;border-radius:4px;transition:color .15s,background .15s;font-family:'Inter',sans-serif}
+.table-row .remove-btn:hover{background:rgba(239,68,68,.15)}
+.table-empty{padding:20px;text-align:center;color:#52525B;font-size:13px}
+
+/* Log Section */
+.log-section{border-top:1px solid #27272A;flex-shrink:0}
+.log-section .log-header{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid #27272A}
+.log-section .log-header h3{font-weight:600;font-size:13px;color:#E4E4E7;flex:1}
+.log-section .log-header .clear-btn{background:none;border:1px solid #3F3F46;color:#71717A;padding:3px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:color .15s,border-color .15s;font-family:'Inter',sans-serif}
+.log-section .log-header .clear-btn:hover{color:#E4E4E7;border-color:#52525B}
+.log-section .log-content{height:120px;overflow-y:auto;padding:8px 16px;font-size:11px;color:#71717A;font-family:'Consolas','Courier New',monospace;line-height:1.6}
+
+/* Bottom Bar */
+.bottom-bar{display:flex;align-items:center;padding:8px 20px;background:#18181B;border-top:1px solid #27272A;height:40px;flex-shrink:0;gap:20px}
+.bottom-bar .total-down{font-size:13px;font-weight:700;color:#4ADE80}
+.bottom-bar .total-up{font-size:13px;font-weight:700;color:#FB923C}
+
+/* Dialog Overlay */
+.dialog-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.dialog-overlay.show{display:flex}
+.dialog-box{background:#27272A;border-radius:12px;padding:20px;width:360px;max-width:90%;border:1px solid #3F3F46}
+.dialog-box h3{font-size:14px;font-weight:600;color:#E4E4E7;margin-bottom:4px}
+.dialog-box p{font-size:12px;color:#71717A;margin-bottom:12px}
+.dialog-box input{width:100%;background:#18181B;border:1px solid #3F3F46;color:#E4E4E7;padding:8px 12px;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;outline:none}
+.dialog-box input:focus{border-color:#8B5CF6}
+.dialog-box .dialog-btns{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+.dialog-box .dialog-btns button{padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s}
+.dialog-box .dialog-btns .btn-cancel{background:#3F3F46;border:none;color:#E4E4E7}
+.dialog-box .dialog-btns .btn-cancel:hover{opacity:.8}
+.dialog-box .dialog-btns .btn-confirm{background:#8B5CF6;border:none;color:#fff}
+.dialog-box .dialog-btns .btn-confirm:hover{opacity:.9}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo">N</div>
+  <span class="app-title">NetSplit</span>
+  <div class="status-dot" id="statusDot"></div>
+  <span class="status-text" id="statusText">Idle</span>
+  <div class="spacer"></div>
+  <button class="refresh-btn" onclick="refreshAll()" title="Refresh All">&#8635;</button>
+  <span class="version">v2.0.0</span>
+</div>
+
+<div class="main-content">
+  <div class="left-panel">
+    <div class="panel-header"><span>Network Adapters</span><button class="refresh-btn" onclick="refreshAll()" title="Refresh Adapters">&#8635;</button></div>
+    <div class="adapter-list" id="adapterList"></div>
+  </div>
+  <div class="right-panel">
+    <div class="panel-header">
+      <h2>AppRouting</h2>
+      <button class="add-btn" onclick="addApp()">+ Add App</button>
+    </div>
+    <div class="table-container">
+      <div class="table-header">
+        <span>Application</span>
+        <span>Assigned Network</span>
+        <span>Action</span>
+        <span>↓ Download</span>
+        <span>↑ Upload</span>
+        <span></span>
+      </div>
+      <div id="appsContainer"></div>
+    </div>
+    <div class="log-section">
+      <div class="log-header">
+        <h3>System Activity</h3>
+        <button class="clear-btn" onclick="clearLogs()">Clear Activity</button>
+      </div>
+      <div class="log-content" id="logContent"></div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-bar">
+  <span class="total-down" id="totalDown">↓ 0.0 MB/s</span>
+  <span class="total-up" id="totalUp">↑ 0.0 MB/s</span>
+</div>
+
+<div class="dialog-overlay" id="renameDialog">
+  <div class="dialog-box">
+    <h3>Rename Adapter</h3>
+    <p id="renameLabel">Enter nickname for:</p>
+    <input type="text" id="renameInput" placeholder="Nickname...">
+    <div class="dialog-btns">
+      <button class="btn-cancel" onclick="closeRenameDialog()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmRename()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let adapters = {};
+let apps = [];
+let nicknameMap = {};
+let renameTarget = null;
+let pollTimer = null;
+let logTimer = null;
+
+function init() {
+  loadAdapters();
+  loadApps();
+  startPolling();
+}
+
+function loadAdapters() {
+  pywebview.api.get_adapters().then(function(data) {
+    adapters = data;
+    renderAdapters();
+    renderApps();
+  });
+}
+
+function loadApps() {
+  Promise.all([
+    pywebview.api.get_apps(),
+    pywebview.api.get_rules()
+  ]).then(function(results) {
+    apps = results[0];
+    nicknameMap = results[1].nicknames || {};
+    renderApps();
+  });
+}
+
+function renderAdapters() {
+  var container = document.getElementById('adapterList');
+  var names = Object.keys(adapters);
+  if (names.length === 0) {
+    container.innerHTML = '<div class="empty-state">No adapters found</div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < names.length; i++) {
+    var name = names[i];
+    var info = adapters[name];
+    var display = nicknameMap[name] || name;
+    html += '<div class="adapter-card">';
+    html += '<div class="top-row">';
+    html += '<div class="dot"></div>';
+    html += '<span class="adapter-name" title="' + name.replace(/"/g,'&quot;') + '">' + display.replace(/</g,'&lt;') + '</span>';
+    html += '<button class="rename-btn" onclick="openRenameDialog(\'' + name.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\')">&#9998;</button>';
+    html += '</div>';
+    html += '<div class="info-row"><span>' + info.ip + '</span><span>' + info.type + '</span></div>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function renderApps() {
+  var container = document.getElementById('appsContainer');
+  if (apps.length === 0) {
+    container.innerHTML = '<div class="table-empty">No applications added. Click "+ Add App" to begin.</div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < apps.length; i++) {
+    var appPath = apps[i];
+    var appName = appPath.split('\\').pop().split('/').pop();
+    var adapterNames = Object.keys(adapters);
+    var selectHtml = '<select onchange="onAssignChange(' + i + ', this.value)" data-index="' + i + '">';
+    selectHtml += '<option value="Unassigned">Unassigned</option>';
+    for (var j = 0; j < adapterNames.length; j++) {
+      var aname = adapterNames[j];
+      var display = nicknameMap[aname] || aname;
+      var val = aname + '|' + adapters[aname].ip;
+      selectHtml += '<option value="' + val.replace(/"/g,'&quot;') + '">' + display.replace(/</g,'&lt;') + ' (' + adapters[aname].ip + ')</option>';
+    }
+    selectHtml += '</select>';
+
+    html += '<div class="table-row" data-path="' + appPath.replace(/"/g,'&quot;') + '">';
+    html += '<span class="app-name" title="' + appPath.replace(/"/g,'&quot;') + '">' + appName.replace(/</g,'&lt;') + '</span>';
+    html += '<div>' + selectHtml + '</div>';
+    html += '<div><button class="launch-btn" onclick="launchApp(' + i + ')">Launch</button></div>';
+    html += '<span class="traffic-down" id="dl_' + i + '">0.0 MB/s</span>';
+    html += '<span class="traffic-up" id="ul_' + i + '">0.0 MB/s</span>';
+    html += '<div><button class="remove-btn" onclick="removeApp(' + i + ')">&#10005;</button></div>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+  for (var i = 0; i < apps.length; i++) {
+    var rows = container.querySelectorAll('.table-row');
+    if (rows[i]) {
+      var sel = rows[i].querySelector('select');
+      if (sel) {
+        (function(idx, selectEl) {
+          pywebview.api.get_rules().then(function(rules) {
+            for (var k = 0; k < (rules.rules || []).length; k++) {
+              var rule = rules.rules[k];
+              if (rule.app_path === apps[idx]) {
+                var target = rule.adapter_name + '|' + rule.adapter_ip;
+                for (var o = 0; o < selectEl.options.length; o++) {
+                  if (selectEl.options[o].value === target) {
+                    selectEl.value = target;
+                    break;
+                  }
+                }
+              }
+            }
+          });
+        })(i, sel);
+      }
+    }
+  }
+}
+
+function onAssignChange(index, value) {
+  var appPath = apps[index];
+  if (value === 'Unassigned') {
+    pywebview.api.remove_rule(appPath).then(function() {
+      pywebview.api.get_rules().then(function() {});
+    });
+  } else {
+    var parts = value.split('|');
+    var adapterName = parts[0];
+    var adapterIp = parts[1];
+    pywebview.api.add_rule(appPath, adapterName, adapterIp).then(function() {
+      pywebview.api.get_rules().then(function() {});
+    });
+  }
+}
+
+function addApp() {
+  pywebview.api.add_app().then(function(result) {
+    if (result) {
+      loadApps();
+    }
+  });
+}
+
+function launchApp(index) {
+  var appPath = apps[index];
+  pywebview.api.get_rules().then(function(rules) {
+    var rule = null;
+    for (var i = 0; i < (rules.rules || []).length; i++) {
+      if (rules.rules[i].app_path === appPath) {
+        rule = rules.rules[i];
+        break;
+      }
+    }
+    if (!rule) {
+      alert('Please assign a network adapter first.');
+      return;
+    }
+    pywebview.api.launch_app(appPath, rule.adapter_name);
+  });
+}
+
+function removeApp(index) {
+  var appPath = apps[index];
+  pywebview.api.remove_app(appPath).then(function() {
+    return pywebview.api.get_apps();
+  }).then(function(newApps) {
+    apps = newApps;
+    renderApps();
+  });
+}
+
+function clearLogs() {
+  pywebview.api.clear_logs().then(function() {
+    document.getElementById('logContent').innerHTML = '';
+  });
+}
+
+function refreshAll() {
+  pywebview.api.refresh_adapters().then(function(data) {
+    adapters = data.adapters || {};
+    nicknameMap = data.nicknames || {};
+    renderAdapters();
+    renderApps();
+    var rules = data.rules || [];
+    var rows = document.querySelectorAll('.table-row');
+    for (var i = 0; i < rows.length; i++) {
+      var sel = rows[i].querySelector('select');
+      if (!sel) continue;
+      var appPath = apps[i];
+      for (var k = 0; k < rules.length; k++) {
+        if (rules[k].app_path === appPath) {
+          var target = rules[k].adapter_name + '|' + rules[k].adapter_ip;
+          for (var o = 0; o < sel.options.length; o++) {
+            if (sel.options[o].value === target) {
+              sel.value = target;
+              break;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function openRenameDialog(name) {
+  renameTarget = name;
+  document.getElementById('renameLabel').textContent = 'Enter nickname for: ' + name;
+  document.getElementById('renameInput').value = nicknameMap[name] || '';
+  document.getElementById('renameDialog').classList.add('show');
+  setTimeout(function() { document.getElementById('renameInput').focus(); }, 100);
+}
+
+function closeRenameDialog() {
+  document.getElementById('renameDialog').classList.remove('show');
+  renameTarget = null;
+}
+
+function confirmRename() {
+  var nickname = document.getElementById('renameInput').value.trim();
+  if (renameTarget) {
+    pywebview.api.rename_adapter(renameTarget, nickname).then(function() {
+      nicknameMap[renameTarget] = nickname || '';
+      closeRenameDialog();
+      renderAdapters();
+      renderApps();
+    });
+  }
+}
+
+function startPolling() {
+  getStatus();
+  getStats();
+  getLogs();
+  pollTimer = setInterval(getStats, 1000);
+  logTimer = setInterval(getLogs, 2000);
+}
+
+function getStatus() {
+  pywebview.api.get_status().then(function(status) {
+    var dot = document.getElementById('statusDot');
+    var text = document.getElementById('statusText');
+    if (status.active) {
+      dot.classList.add('active');
+      text.textContent = 'Service Active';
+      text.style.color = '#22C55E';
+    } else {
+      dot.classList.remove('active');
+      text.textContent = 'Idle';
+      text.style.color = '#71717A';
+    }
+  });
+}
+
+function getStats() {
+  pywebview.api.get_stats().then(function(stats) {
+    var totalDl = 0;
+    var totalUl = 0;
+    for (var i = 0; i < apps.length; i++) {
+      var dlEl = document.getElementById('dl_' + i);
+      var ulEl = document.getElementById('ul_' + i);
+      if (dlEl && ulEl) {
+        var appPath = apps[i];
+        if (stats[appPath]) {
+          dlEl.textContent = formatSpeed(stats[appPath].down);
+          ulEl.textContent = formatSpeed(stats[appPath].up);
+          totalDl += stats[appPath].down;
+          totalUl += stats[appPath].up;
+        } else {
+          dlEl.textContent = '0.0 MB/s';
+          ulEl.textContent = '0.0 MB/s';
+        }
+      }
+    }
+    document.getElementById('totalDown').textContent = '\u2193 ' + formatSpeed(totalDl);
+    document.getElementById('totalUp').textContent = '\u2191 ' + formatSpeed(totalUl);
+    getStatus();
+  });
+}
+
+function getLogs() {
+  pywebview.api.get_logs().then(function(logs) {
+    var el = document.getElementById('logContent');
+    el.innerHTML = logs;
+  });
+}
+
+function formatSpeed(bytesPerSec) {
+  var mbps = bytesPerSec / (1024 * 1024);
+  if (mbps < 0.01) return '0.0 MB/s';
+  return mbps.toFixed(1) + ' MB/s';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  function tryInit() {
+    if (typeof pywebview !== 'undefined' && pywebview.api) {
+      init();
+    } else {
+      setTimeout(tryInit, 100);
+    }
+  }
+  window.addEventListener('pywebviewready', init);
+  tryInit();
+});
+document.getElementById('renameInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') confirmRename();
+  if (e.key === 'Escape') closeRenameDialog();
+});
+</script>
+</body>
+</html>
