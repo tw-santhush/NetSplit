@@ -132,11 +132,39 @@ def get_current_default_route():
     raise RuntimeError(f"Interface with index {index} not found")
 
 
-def set_default_route(gateway_ip, idx, metric=1):
-    result = _route(["change", "0.0.0.0", "mask", "0.0.0.0", gateway_ip, "if", str(idx), f"metric={metric}"])
+def _log_and_route(args, log_callback=None):
+    cmd = "route " + " ".join(args)
+    if log_callback:
+        log_callback(f"Running: {cmd}")
+    return subprocess.run(["route"] + args, capture_output=True, text=True)
+
+
+def _log_and_netsh(args, log_callback=None):
+    cmd = "netsh " + " ".join(args)
+    if log_callback:
+        log_callback(f"Running: {cmd}")
+    return subprocess.run(["netsh"] + args, capture_output=True, text=True)
+
+
+def set_default_route(gateway_ip, idx, metric=5, log_callback=None):
+    idx_str = str(idx)
+
+    for m in ("5", "10", "20"):
+        cmd = ["change", "0.0.0.0", "mask", "0.0.0.0", gateway_ip, "metric", m, "if", idx_str]
+        result = _log_and_route(cmd, log_callback)
+        if result.returncode == 0:
+            return
+
+    cmd2 = ["add", "0.0.0.0", "mask", "0.0.0.0", gateway_ip, "if", idx_str, "metric", str(metric)]
+    result = _log_and_route(cmd2, log_callback)
+    if result.returncode == 0:
+        return
+
+    cmd3 = ["interface", "ipv4", "set", "route", "0.0.0.0/0", idx_str, gateway_ip, f"metric={metric}"]
+    result = _log_and_netsh(cmd3, log_callback)
     if result.returncode != 0:
         raise RuntimeError(
-            f"Failed to set default route: {result.stderr.strip() or result.stdout.strip()}"
+            f"All route attempts failed. Last command stderr: {result.stderr.strip() or result.stdout.strip()}"
         )
 
 
@@ -156,8 +184,8 @@ def launch_app(app_path, adapter_name, adapters, log_callback=None):
                 raise RuntimeError(f"Adapter '{adapter_name}' not found in metrics")
             metric_snapshot = metrics
 
-            log(f"Setting adapter {primary['idx']} to metric 1")
-            set_adapter_metric(primary['idx'], 1)
+            log(f"Setting adapter {primary['idx']} to metric 5")
+            set_adapter_metric(primary['idx'], 5)
             metric_changed.append(adapter_name)
             for name, info in metrics.items():
                 if name != adapter_name:
@@ -176,7 +204,7 @@ def launch_app(app_path, adapter_name, adapters, log_callback=None):
 
             original_route = get_current_default_route()
             log(f"Switching default route to {gateway} via {adapter_name}")
-            set_default_route(gateway, gw_idx, 1)
+            set_default_route(gateway, gw_idx, 5, log)
             time.sleep(0.5)
 
             adapter_ip = adapters.get(adapter_name, {}).get("ip", "")
@@ -233,6 +261,6 @@ def launch_app(app_path, adapter_name, adapters, log_callback=None):
                         log(f"Metric restore error for {name} (non-fatal): {restore_err}")
             if original_route:
                 try:
-                    set_default_route(original_route['gateway'], original_route['index'], original_route['metric'])
+                    set_default_route(original_route['gateway'], original_route['index'], original_route['metric'], log)
                 except Exception as restore_err:
                     log(f"Route restore error (non-fatal): {restore_err}")
