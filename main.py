@@ -249,9 +249,10 @@ class Api:
             return {}
 
     def refresh_adapters(self):
-        self._log("Refreshing adapters...")
-        self.config = load_config()
         self.adapters = refresh_adapter_data()
+        count = len(self.adapters)
+        self._log(f"Hardware scan complete: detected {count} network adapters")
+        self.config = load_config()
         return {
             "adapters": self.adapters,
             "nicknames": get_nicknames(self.config),
