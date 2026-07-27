@@ -45,8 +45,10 @@ body{font-family:'Inter',sans-serif;background:#18181B;color:#E4E4E7;overflow:hi
 .left-panel .adapter-card .adapter-name{font-weight:600;font-size:13px;color:#E4E4E7;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .left-panel .adapter-card .rename-btn{background:none;border:none;color:#71717A;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;transition:color .15s,background .15s}
 .left-panel .adapter-card .rename-btn:hover{color:#8B5CF6;background:#2F2F35}
-.left-panel .adapter-card .info-row{font-size:11px;color:#71717A;margin-top:4px;padding-left:16px}
-.left-panel .adapter-card .info-row span{margin-right:12px}
+.left-panel .adapter-card .info-row{font-size:11px;color:#71717A;margin-top:4px;padding-left:16px;display:flex;gap:12px}
+.left-panel .adapter-card .speed-row{font-size:10px;color:#52525B;margin-top:2px;padding-left:16px;display:flex;gap:12px}
+.left-panel .adapter-card .speed-row .down{color:#4ADE80}
+.left-panel .adapter-card .speed-row .up{color:#FB923C}
 .left-panel .empty-state{padding:20px;text-align:center;color:#52525B;font-size:13px}
 
 /* Right Panel */
@@ -207,13 +209,15 @@ function renderAdapters() {
     var name = names[i];
     var info = adapters[name];
     var display = nicknameMap[name] || name;
+    var safeName = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     html += '<div class="adapter-card">';
     html += '<div class="top-row">';
     html += '<div class="dot"></div>';
     html += '<span class="adapter-name" title="' + name.replace(/"/g,'&quot;') + '">' + display.replace(/</g,'&lt;') + '</span>';
-    html += '<button class="rename-btn" onclick="openRenameDialog(\'' + name.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\')">&#9998;</button>';
+    html += '<button class="rename-btn" onclick="openRenameDialog(\'' + safeName + '\')">&#9998;</button>';
     html += '</div>';
     html += '<div class="info-row"><span>' + info.ip + '</span><span>' + info.type + '</span></div>';
+    html += '<div class="speed-row" id="spd_' + i + '"><span class="down">\u2193 0.0 MB/s</span><span class="up">\u2191 0.0 MB/s</span></div>';
     html += '</div>';
   }
   container.innerHTML = html;
@@ -419,21 +423,36 @@ function getStats() {
       var ulEl = document.getElementById('ul_' + i);
       if (dlEl && ulEl) {
         var appPath = apps[i];
-        if (stats[appPath]) {
-          dlEl.textContent = formatSpeed(stats[appPath].down);
-          ulEl.textContent = formatSpeed(stats[appPath].up);
-          totalDl += stats[appPath].down;
-          totalUl += stats[appPath].up;
+        if (stats.apps && stats.apps[appPath]) {
+          dlEl.textContent = formatSpeed(stats.apps[appPath].down_mbps);
+          ulEl.textContent = formatSpeed(stats.apps[appPath].up_mbps);
         } else {
           dlEl.textContent = '0.0 MB/s';
           ulEl.textContent = '0.0 MB/s';
         }
       }
     }
-    document.getElementById('totalDown').textContent = '\u2193 ' + formatSpeed(totalDl);
-    document.getElementById('totalUp').textContent = '\u2191 ' + formatSpeed(totalUl);
+    document.getElementById('totalDown').textContent = '\u2193 ' + formatSpeed(stats.total_down_mbps || 0);
+    document.getElementById('totalUp').textContent = '\u2191 ' + formatSpeed(stats.total_up_mbps || 0);
+    updateAdapterSpeeds(stats.adapters || {});
     getStatus();
   });
+}
+
+function updateAdapterSpeeds(adapterStats) {
+  var names = Object.keys(adapters);
+  for (var i = 0; i < names.length; i++) {
+    var el = document.getElementById('spd_' + i);
+    if (el) {
+      var name = names[i];
+      var spd = adapterStats[name];
+      if (spd) {
+        el.innerHTML = '<span class="down">\u2193 ' + formatSpeed(spd.down_mbps) + '</span><span class="up">\u2191 ' + formatSpeed(spd.up_mbps) + '</span>';
+      } else {
+        el.innerHTML = '<span class="down">\u2193 0.0 MB/s</span><span class="up">\u2191 0.0 MB/s</span>';
+      }
+    }
+  }
 }
 
 function getLogs() {
@@ -443,8 +462,7 @@ function getLogs() {
   });
 }
 
-function formatSpeed(bytesPerSec) {
-  var mbps = bytesPerSec / (1024 * 1024);
+function formatSpeed(mbps) {
   if (mbps < 0.01) return '0.0 MB/s';
   return mbps.toFixed(1) + ' MB/s';
 }
