@@ -1,183 +1,196 @@
-# 🌐 NetSplit
+# ⚡ NetSplit
 
-**NetSplit v3.1.0** is a Windows desktop application that lets you route specific applications (like Chrome, Steam, Discord) through specific network adapters (Wi‑Fi, USB tethering, Ethernet) – all from a modern, dark‑themed dashboard.
+**Take full control of your network traffic.** NetSplit lets you route specific applications through specific network adapters — perfect for gamers, streamers, and power users who want to separate their traffic.
 
-Whether you want to download large files through a mobile hotspot while keeping your games on a low‑latency Wi‑Fi connection, or simply control which app uses which network, NetSplit makes it effortless.
+[![GitHub release](https://img.shields.io/github/v/release/tw-santhush/NetSplit)](https://github.com/tw-santhush/NetSplit/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D6?logo=windows)](https://www.microsoft.com/windows)
+
+---
+
+## 🎯 What is NetSplit?
+
+NetSplit is a Windows desktop application that allows you to:
+
+- **Route specific apps** through specific network adapters (Wi-Fi, Ethernet, USB tethering)
+- **Monitor network traffic** in real-time per adapter and per app
+- **Optimize your network usage** by assigning the right app to the right connection
+
+**Use Cases:**
+- 🎮 **Gamers:** Route games through low-latency Wi-Fi while downloading on Ethernet
+- 📡 **Streamers:** Separate streaming traffic from other downloads
+- 💼 **Remote Workers:** Keep work apps on VPN while personal apps use regular internet
 
 ---
 
 ## ✨ Features
 
-- ✅ **Add apps (file picker)** – Browse and add any `.exe` with a native file picker.
-- ✅ **Assign apps to adapters (dropdown)** – Select which network adapter each app uses.
-- ✅ **Launch apps (routing works)** – Launch any assigned app with its dedicated network route.
-- ✅ **Live network monitor** – Real‑time download/upload speeds per adapter and per app.
-- ✅ **Rename adapters** – Give adapters custom nicknames (e.g., "Home Wi‑Fi", "USB Tether").
-- ✅ **System activity log** – Timestamped log of all actions.
-- ✅ **One‑click start (start.bat)** – Launch with a single batch file.
+### Core Features
+- 🎮 **App Routing** — Route specific `.exe` applications through specific network adapters
+- 📡 **Live Network Monitor** — Real-time download/upload speeds per adapter
+- 📊 **Per-App Traffic** — See download/upload speeds for each running app
+
+### User Experience
+- 🌙 **Dark & Light Themes** — Choose your preferred UI theme
+- ⚙️ **Backend Toggle** — Switch between Edge Chromium (modern UI) and MSHTML (fast startup)
+- 🖥️ **System Tray** — Minimize to tray with right-click menu for quick access
+- 🔍 **Smart Auto Find Apps** — Automatically detects internet-using applications
+
+### Power Features
+- 📦 **Quick Actions** — Optimize All, Clear All Rules, Refresh Adapters
+- 🔄 **Auto-Refresh Adapters** — Updates adapter list every 5 seconds
+- 📝 **System Activity Log** — Track all actions and events with timestamps
+- ⚙️ **Custom Adapter Nicknames** — Rename adapters for easy identification
+
+### Performance & Stability
+- 🚀 **Fast Startup** — Loads instantly with MSHTML backend, modern UI with Edge
+- 🛡️ **Concurrent Routing Protection** — Prevents route conflicts
+- 🔒 **Secure** — No command injection vulnerabilities
+- 💾 **Atomic Config Saves** — Prevents corruption
 
 ---
 
-## 🖼️ Screenshot
+## 📸 Screenshots
 
-*(Add a screenshot of your app here – you can replace this with an actual image later.)*
+| Dark Theme | Light Theme |
+|------------|-------------|
+| ![Dark Theme](screenshots/dark-theme.png) | ![Light Theme](screenshots/light-theme.png) |
 
-![NetSplit Dashboard](./screenshot.png)
-
----
-
-## 📋 Requirements
-
-- **Windows 10 / 11** (64‑bit recommended)
-- **Python 3.10+** (if running from source)
-- **Administrator privileges** (required to modify Windows routing tables and launch ForceBindIP)
+*Settings dialog allows you to switch between Edge and MSHTML backends and toggle themes.*
 
 ---
 
-## 🛠️ Installation & Setup
+## 📦 Download
 
-### 1. Clone the repository
+Download the latest installer from the **[Releases](https://github.com/tw-santhush/NetSplit/releases)** page.
+
+| File | Description |
+|------|-------------|
+| `NetSplit_Setup.exe` | Full installer (recommended) |
+| Source code (ZIP) | Source code archive |
+
+---
+
+## 🛠️ System Requirements
+
+| Requirement | Details |
+|-------------|---------|
+| **OS** | Windows 10 or Windows 11 (64-bit) |
+| **Privileges** | Administrator (required for routing) |
+| **Runtime** | Edge WebView2 (auto-installed if missing) |
+| **Disk Space** | ~200 MB |
+
+---
+
+## 🚀 Quick Start
+
+1. **Download** `NetSplit_Setup.exe` from the [Releases](https://github.com/tw-santhush/NetSplit/releases) page.
+2. **Run** the installer (right-click → "Run as administrator").
+3. **Launch** NetSplit from the Start Menu or Desktop shortcut.
+4. **Add** an application (e.g., `chrome.exe`) using the "Add App" button.
+5. **Assign** it to a network adapter using the dropdown.
+6. **Click Launch** and watch the traffic flow!
+
+---
+
+## 🧑‍💻 Build from Source
+
+### Prerequisites
+- Python 3.10 or higher
+- Git
+- Inno Setup (for building installer)
+
+### Steps
 
 ```bash
+# Clone the repository
 git clone https://github.com/tw-santhush/NetSplit.git
 cd NetSplit
-```
 
-### 2. Install Python dependencies
-
-```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-This installs:
-- `pywebview` – for the native desktop window
-- `psutil` – for network statistics and process management
-- `pywin32` – for Windows API calls (icon extraction, routing)
-- `Pillow` – for image processing (icon fallbacks)
-
-### 3. Run the app
-
-```bash
+# Run the app
 python main.py
 ```
 
-> **Note:** The app must be run with **administrator privileges** to modify network routes. Right‑click your terminal and select **"Run as administrator"**, or run the `start.bat` file (which you can create to auto‑elevate).
-
----
-
-## 🚀 Usage Guide
-
-### Add an Application
-1. Click the **"Add App"** button.
-2. Browse and select any `.exe` file (e.g., `chrome.exe`).
-3. The app appears in the list with its original icon.
-
-### Assign a Network
-1. In the application row, click the **"Assigned Network"** dropdown.
-2. Select an adapter from the list (e.g., "Wi‑Fi", "USB Tethering").
-3. The rule is saved immediately – the **"Launch"** button becomes active.
-
-### Launch the App
-- Click **"Launch"** – the application opens and all its traffic is forced through the selected adapter.
-- The **System Activity** log confirms the launch.
-
-### Monitor Traffic
-- The **Traffic** column shows real‑time download/upload speeds for each running app.
-- The **Network Adapters** panel also displays aggregate speeds for each adapter.
-
-### Refresh Adapters
-- Click **"↻ Refresh Adapters"** at the bottom of the Network Adapters panel to re‑scan for newly connected adapters (e.g., a USB Wi‑Fi dongle).
-
-### Rename an Adapter
-- Double‑click an adapter in the list and enter a custom nickname (e.g., "Home Wi‑Fi").
-
----
-
-## 🗂️ Configuration
-
-All settings are stored in `config.json` (created automatically in the app directory):
-
-```json
-{
-  "apps": [
-    { "path": "C:/.../chrome.exe", "name": "chrome.exe", "icon": "data:image/png;base64,..." }
-  ],
-  "rules": [
-    { "app_path": "C:/.../chrome.exe", "adapter_name": "Wi-Fi", "adapter_ip": "192.168.1.100" }
-  ],
-  "nicknames": {
-    "Wi-Fi": "Home Wi-Fi",
-    "Ethernet 2": "USB Tether"
-  }
-}
-```
-
-You can edit this file manually, but the app provides a UI for all settings.
-
----
-
-## 📦 Packaging as a Single `.exe`
-
-To share the app with friends who don't have Python installed, you can package it with **PyInstaller**.
+### Build the Installer
 
 ```bash
-# Install PyInstaller
-pip install pyinstaller
+# Build with PyInstaller
+pyinstaller NetSplit.spec
 
-# Create a single .exe
-pyinstaller --onefile --windowed --name NetSplit main.py
-
-# The .exe will be in the dist/ folder
+# Build the installer (requires Inno Setup)
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
 ```
 
-Your friends can just double‑click `NetSplit.exe` – no Python needed.
-
 ---
 
-## 🧠 How It Works (Under the Hood)
+## 🐛 Troubleshooting
 
-NetSplit uses a combination of techniques to route traffic:
+### App starts in system tray instead of desktop
+- Click the tray icon to restore the window.
+- This is by design — minimize to tray for background operation.
 
-- **ForceBindIP** – A lightweight tool that forces a specific application to bind to a specific IP address (and thus a specific network adapter). The app auto‑downloads it on first run.
-- **Windows Routing Table** – Temporarily adjusts the default route so that traffic from the launched app is directed through the chosen adapter.
-- **psutil** – Polls network statistics every second to provide live speed updates.
-- **PyWebView** – Provides a native window and allows JavaScript to call Python functions directly – no API mismatches, no CORS, no Electron bloat.
+### "Main window failed to start" error
+- **Solution:** Toggle to **MSHTML** backend in Settings → Backend.
+- Or install WebView2 Runtime manually from Microsoft.
 
----
+### Apps not routing through the correct adapter
+- Ensure you're running **as Administrator**.
+- Check that the app is assigned to the correct adapter.
+- Verify the adapter is connected and has internet access.
 
-## ⚠️ Known Issues
-
-- **Administrator privileges required** – NetSplit modifies Windows routing tables, so it must be run as admin.
-- **ForceBindIP** – The app auto-downloads ForceBindIP on first run. Some antivirus software may flag it as suspicious; this is a false positive.
-- **Adapter detection** – Virtual adapters (Hyper‑V, VMware, VirtualBox) are intentionally hidden to avoid confusion.
-- **Single‑instance routing** – Only one app can be actively routed at a time. Routing resets when the app exits.
+### IDM shows admin warning
+- This is a known limitation of ForceBindIP. IDM detects admin mode and shows a warning. Close the warning and IDM will still work.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! If you have ideas for:
-- Bandwidth limiting per app
-- System tray integration
-- Dark/light theme toggle
-- Export/Import rules
+Contributions are welcome! Here's how you can help:
 
-Feel free to open an issue or submit a pull request.
+1. **Fork** the repository.
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`).
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`).
+4. **Push** to the branch (`git push origin feature/amazing-feature`).
+5. **Open** a Pull Request.
+
+Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting.
 
 ---
 
 ## 📄 License
 
-This project is open‑source and available under the [MIT License](LICENSE).
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Credits
+## 🙏 Acknowledgments
 
-- [ForceBindIP](https://r1ch.net/projects/forcebindip) – the core injection tool.
-- [PyWebView](https://pywebview.flowrl.com/) – for the lightweight desktop window.
-- Built with ❤️ by [tw‑santhush](https://github.com/tw-santhush).
+- [pywebview](https://github.com/r0x0r/pywebview) — WebView2/GTK/WebKit GUI framework
+- [psutil](https://github.com/giampaolo/psutil) — Cross-platform system monitoring
+- [ForceBindIP](https://r1ch.net/projects/forcebindip/) — Forced application binding
+- [Inno Setup](https://jrsoftware.org/isinfo.php) — Installer creation
 
 ---
 
-**Enjoy full control over your network traffic!** 🚀
+## 📊 Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| **v3.2.0** | July 2026 | Stable release — backend toggle, theme support, all bugs fixed |
+| v3.1.1 | July 2026 | Route command syntax fix |
+| v3.1.0 | July 2026 | 24+ bug fixes, performance improvements |
+| v3.0.0 | July 2026 | Complete rewrite with modern UI |
+
+---
+
+## 📬 Contact
+
+- **Issues:** [GitHub Issues](https://github.com/tw-santhush/NetSplit/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/tw-santhush/NetSplit/discussions)
+
+---
+
+Built with ❤️ by tw-santhush
