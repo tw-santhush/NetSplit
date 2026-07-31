@@ -23,6 +23,7 @@ def load_config(path=None):
         data.setdefault("apps", [])
         data.setdefault("rules", [])
         data.setdefault("nicknames", {})
+        data.setdefault("backend", "edgechromium")
         return data
     except (json.JSONDecodeError, IOError):
         return {"apps": [], "rules": [], "nicknames": {}}
@@ -74,4 +75,13 @@ def get_theme(config):
 
 def set_theme(config, theme):
     config["theme"] = theme
+    return config
+
+
+def get_backend(config):
+    return config.get("backend", "edgechromium")
+
+
+def set_backend(config, backend):
+    config["backend"] = backend
     return config

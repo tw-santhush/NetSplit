@@ -1,6 +1,6 @@
 @echo off
 cd /d C:\projects\NetSplit
-echo Building NetSplit V3.1.0 Installer...
+echo Building NetSplit V3.1.1 Installer...
 
 echo Step 1: Installing Python dependencies...
 call pip install -r requirements.txt
@@ -9,7 +9,7 @@ if errorlevel 1 exit /b %errorlevel%
 echo Step 2: Packaging application with PyInstaller...
 call pip install pyinstaller
 if errorlevel 1 exit /b %errorlevel%
-call pyinstaller --onefile --windowed --icon "icon.ico" --add-data "ui;ui" --add-data "tools;tools" --add-data "icon.ico;." --name "NetSplit" main.py
+call pyinstaller --noconfirm NetSplit.spec
 if errorlevel 1 exit /b %errorlevel%
 
 echo Step 3: Building installer with Inno Setup...

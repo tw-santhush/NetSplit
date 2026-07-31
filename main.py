@@ -11,6 +11,7 @@ import ctypes
 from ctypes import wintypes
 import io
 import base64
+import atexit
 from datetime import datetime
 
 import win32ui
@@ -26,13 +27,48 @@ except ImportError:
     _HAS_TRAY = False
 
 from network_scanner import get_all_adapters
-from config_manager import load_config, save_config, add_rule, remove_rule_for_app, get_nicknames, set_nickname, get_rules, get_theme, set_theme
+from config_manager import load_config, save_config, add_rule, remove_rule_for_app, get_nicknames, set_nickname, get_rules, get_theme, set_theme, get_backend, set_backend
 from router import launch_app as router_launch
 from bindip_utils import is_installed, download_and_extract
 
 _window_ref = None
 _tray_icon = None
 
+
+def _check_single_instance():
+    mutex_name = "Global\\NetSplit-{c0a8e5f1-3e7b-4a2d-8f9c-1e2b3a4c5d6e}"
+    ctypes.windll.kernel32.CreateMutexW(None, False, mutex_name)
+    if ctypes.windll.kernel32.GetLastError() == 183:
+        return False
+    return True
+
+
+def _kill_child_procs():
+    try:
+        import router
+        router.cleanup_child_procs()
+    except Exception:
+        pass
+
+
+def cleanup():
+    global _tray_icon
+    if _tray_icon:
+        try:
+            _tray_icon.stop()
+        except Exception:
+            pass
+        _tray_icon = None
+    _kill_child_procs()
+    try:
+        current_proc = psutil.Process()
+        for child in current_proc.children(recursive=True):
+            try:
+                child.terminate()
+            except psutil.NoSuchProcess:
+                pass
+    except Exception:
+        pass
 
 def _is_admin():
     try:
@@ -45,7 +81,7 @@ def _elevate():
     if _is_admin():
         return
     ctypes.windll.shell32.ShellExecuteW(
-        None, "runas", sys.executable, subprocess.list2cmdline(sys.argv), None, 0
+        None, "runas", sys.executable, subprocess.list2cmdline(sys.argv), None, 1
     )
     sys.exit()
 
@@ -562,6 +598,15 @@ class Api:
         with _app_traffic_lock:
             return dict(_app_traffic)
 
+    def get_backend(self):
+        return get_backend(self.config)
+
+    def set_backend(self, backend):
+        self.config = set_backend(self.config, backend)
+        save_config(self.config)
+        self._log(f"Backend changed to {backend}")
+        return True
+
     def optimize_rules(self):
         rules = get_rules(self.config)
         assigned = {r["app_path"] for r in rules}
@@ -673,13 +718,17 @@ if _HAS_TRAY:
 
             def on_quit():
                 global _tray_icon, _window_ref
+                _kill_child_procs()
                 if _window_ref:
                     try:
                         _window_ref.destroy()
                     except Exception:
                         pass
                 if _tray_icon:
-                    _tray_icon.stop()
+                    try:
+                        _tray_icon.stop()
+                    except Exception:
+                        pass
                 os._exit(0)
 
             def on_left_click(icon, button):
@@ -713,7 +762,11 @@ if _HAS_TRAY:
 
 def main():
     _hide_console()
+    if not _check_single_instance():
+        ctypes.windll.user32.MessageBoxW(0, "NetSplit is already running.", "NetSplit", 0)
+        return
     _elevate()
+    atexit.register(cleanup)
     if not is_installed():
         try:
             download_and_extract()
@@ -728,41 +781,52 @@ def main():
     global _window_ref
 
     def on_closing():
-        global _tray_icon
-        if _tray_icon:
-            try:
-                _tray_icon.stop()
-            except Exception:
-                pass
-        return True
-
-    _window_ref = webview.create_window(
-        "NetSplit",
-        "ui/index.html",
-        width=1100,
-        height=750,
-        min_size=(900, 600),
-        js_api=api,
-        resizable=True
-    )
-
-    _window_ref.events.closing += on_closing
-    try:
-        _window_ref.events.shown += lambda: _set_window_icon()
-    except Exception:
-        pass
-    threading.Thread(target=_set_window_icon, daemon=True).start()
+        global _window_ref, _tray_icon
+        cleanup()
+        os._exit(0)
 
     try:
-        _window_ref.events.minimized += lambda: _window_ref.hide()
-    except Exception:
-        pass
+        gui_backend = get_backend(api.config)
+        start_url = "ui/index.html"
+        _window_ref = webview.create_window(
+            "NetSplit",
+            start_url,
+            width=1100,
+            height=750,
+            min_size=(900, 600),
+            js_api=api,
+            resizable=True,
+        )
 
-    if _HAS_TRAY:
-        threading.Thread(target=_start_tray, args=(api,), daemon=False).start()
-        _tray_ready.wait(timeout=3)
+        _window_ref.events.closing += on_closing
 
-    webview.start(debug=False)
+        try:
+            _window_ref.events.shown += lambda: _set_window_icon()
+        except Exception:
+            pass
+
+        try:
+            _window_ref.events.minimized += lambda: _window_ref.hide()
+        except Exception:
+            pass
+
+        if _HAS_TRAY:
+            threading.Thread(target=_start_tray, args=(api,), daemon=False).start()
+            _tray_ready.wait(timeout=3)
+
+        gui_backend = get_backend(api.config)
+        try:
+            webview.start(gui=gui_backend, debug=False)
+        except Exception:
+            if gui_backend == 'edgechromium':
+                webview.start(gui='mshtml', debug=False)
+            else:
+                raise
+    except Exception as e:
+        print(f"ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        input("Press Enter to exit...")
 
     if _HAS_TRAY:
         while _tray_icon is not None:
