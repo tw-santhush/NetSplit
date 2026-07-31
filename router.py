@@ -10,6 +10,9 @@ from bindip_utils import get_forcebindip_path
 
 _route_lock = threading.Lock()
 
+_active_procs = []
+_active_procs_lock = threading.Lock()
+
 _netsh_cache = {}
 _NETSH_CACHE_TTL = 5
 
@@ -132,6 +135,22 @@ def get_current_default_route():
     raise RuntimeError(f"Interface with index {index} not found")
 
 
+def _register_proc(p):
+    with _active_procs_lock:
+        _active_procs.append(p)
+
+
+def cleanup_child_procs():
+    with _active_procs_lock:
+        for p in _active_procs:
+            try:
+                if p.poll() is None:
+                    p.terminate()
+            except Exception:
+                pass
+        _active_procs.clear()
+
+
 def _log_and_route(args, log_callback=None):
     cmd = "route " + " ".join(args)
     if log_callback:
@@ -214,24 +233,30 @@ def launch_app(app_path, adapter_name, adapters, log_callback=None):
             forcebindip = get_forcebindip_path()
             cmd = [forcebindip, "-i", adapter_ip, app_path]
             log(f"Launching: {' '.join(cmd)}")
-            proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            si = subprocess.STARTUPINFO()
+            si.dwFlags = subprocess.STARTF_USESHOWWINDOW
+            si.wShowWindow = 0  # SW_HIDE
+            proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, startupinfo=si, creationflags=subprocess.CREATE_NO_WINDOW)
+            _register_proc(proc)
             log(f"Launched {os.path.basename(app_path)}")
 
             time.sleep(0.3)
 
             target_name = os.path.basename(app_path).lower()
             target_proc = None
-            threshold = time.time()
-            for p in psutil.process_iter(['pid', 'name', 'create_time']):
+            forcebindip_pid = proc.pid
+            for _ in range(50):
                 try:
-                    if p.info['name'] and p.info['name'].lower() == target_name:
-                        if p.info['create_time'] and p.info['create_time'] >= threshold - 2:
-                            parent = p.parent()
-                            if parent and 'forcebindip' in parent.name().lower():
-                                target_proc = p
-                                break
+                    parent_proc = psutil.Process(forcebindip_pid)
+                    for child in parent_proc.children():
+                        if child.info['name'] and child.info['name'].lower() == target_name:
+                            target_proc = child
+                            break
+                    if target_proc:
+                        break
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
-                    continue
+                    pass
+                time.sleep(0.1)
 
             _pid = 0
             if target_proc:

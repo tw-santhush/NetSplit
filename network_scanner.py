@@ -27,7 +27,7 @@ def get_all_adapters():
             continue
 
         name_lower = name.lower()
-        if any(kw in name_lower for kw in ["loopback", "pseudo", "virtual", "local area connection"]):
+        if any(kw in name_lower for kw in ["loopback", "pseudo", "virtual"]):
             continue
 
         ipv4 = None

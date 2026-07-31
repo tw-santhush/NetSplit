@@ -162,12 +162,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
 @keyframes scanPulse{0%,100%{opacity:1}50%{opacity:.25}}
 .theme-toggle{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;border-radius:4px;line-height:1;transition:background .15s;margin-right:8px}
 .theme-toggle:hover{background:var(--card-bg)}
-/* Loading Spinner */
-.loading-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--dialog-overlay);z-index:999;align-items:center;justify-content:center}
-.loading-overlay.show{display:flex}
-.loading-spinner{width:36px;height:36px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:loadSpin .8s linear infinite}
-@keyframes loadSpin{to{transform:rotate(360deg)}}
-/* End Loading Spinner */
 /* End Toggle */
 
 /* Bottom Bar */
@@ -210,6 +204,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
   <div class="spacer"></div>
   <button class="refresh-btn" onclick="refreshAll()" title="Refresh All">&#8635;</button>
   <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+  <button class="theme-toggle" onclick="openSettings()" title="Settings">⚙️</button>
   <span class="version">v3.1.0</span>
 </div>
 
@@ -282,8 +277,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overf
   </div>
 </div>
 
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner"></div>
+<div class="dialog-overlay" id="settingsDialog">
+  <div class="dialog-box">
+    <h3>Settings</h3>
+    <p>WebView Backend</p>
+    <div style="margin-top:8px">
+      <label style="font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="radio" name="backend" value="edgechromium" onchange="setBackend('edgechromium')">
+        Edge Chromium (modern, requires WebView2)
+      </label>
+      <label style="font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:6px">
+        <input type="radio" name="backend" value="mshtml" onchange="setBackend('mshtml')">
+        MSHTML (legacy, always available)
+      </label>
+    </div>
+    <p style="margin-top:12px;font-size:11px;color:var(--text-dim)">Restart required for backend change to take effect.</p>
+    <div class="dialog-btns">
+      <button class="btn-cancel" onclick="closeSettings()">Close</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -300,7 +312,6 @@ let _refreshLock = false;
 let _confirmCallback = null;
 
 function init() {
-  document.getElementById('loadingOverlay').classList.add('show');
   refreshAll();
   startPolling();
   startAutoRefresh();
@@ -381,7 +392,6 @@ function renderApps(ruleData) {
   var container = document.getElementById('appsContainer');
   if (apps.length === 0) {
     container.innerHTML = '<div class="table-empty">No applications added. Click "+ Add App" to begin.</div>';
-    document.getElementById('loadingOverlay').classList.remove('show');
     return;
   }
   var rulesPromise = ruleData && ruleData.rules ? Promise.resolve(ruleData.rules) : pywebview.api.get_rules().then(function(r) { return r.rules || r; });
@@ -423,10 +433,8 @@ function renderApps(ruleData) {
       html += '</div>';
     }
     container.innerHTML = html;
-    document.getElementById('loadingOverlay').classList.remove('show');
   }).catch(function(err) {
     pywebview.api.add_log('Error rendering apps: ' + (err.message || err));
-    document.getElementById('loadingOverlay').classList.remove('show');
   });
 }
 
@@ -601,7 +609,7 @@ function clearLogs() {
 }
 
 function refreshAll() {
-  if (document.hidden) { document.getElementById('loadingOverlay').classList.remove('show'); return; }
+  if (document.hidden) return;
   var btn = document.querySelector('.refresh-btn');
   if (btn) btn.classList.add('spin');
   pywebview.api.refresh_adapters().then(function(data) {
@@ -611,10 +619,8 @@ function refreshAll() {
     renderAdapters();
     renderApps(data);
     updateRefreshTimestamp();
-    document.getElementById('loadingOverlay').classList.remove('show');
   }).catch(function(err) {
     pywebview.api.add_log('Refresh error: ' + (err.message || err));
-    document.getElementById('loadingOverlay').classList.remove('show');
   }).finally(function() {
     if (btn) btn.classList.remove('spin');
   });
@@ -789,6 +795,28 @@ document.getElementById('renameInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') confirmRename();
   if (e.key === 'Escape') closeRenameDialog();
 });
+
+function openSettings() {
+  pywebview.api.get_backend().then(function(backend) {
+    var radios = document.getElementsByName('backend');
+    for (var i = 0; i < radios.length; i++) {
+      radios[i].checked = radios[i].value === backend;
+    }
+    document.getElementById('settingsDialog').classList.add('show');
+  }).catch(function(err) {
+    pywebview.api.add_log('Settings error: ' + (err.message || err));
+  });
+}
+
+function closeSettings() {
+  document.getElementById('settingsDialog').classList.remove('show');
+}
+
+function setBackend(backend) {
+  pywebview.api.set_backend(backend).catch(function(err) {
+    pywebview.api.add_log('Backend error: ' + (err.message || err));
+  });
+}
 </script>
 
 </body>
